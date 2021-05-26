@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-db # .spec.serviceNameの値と一致する必要があります
+  labels:
+    {{- include "opendata-map.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "opendata-map.fullname" . }}-db # .spec.template.metadata.labelsの値と一致する必要があります
+  serviceName: {{ include "opendata-map.fullname" . }}-db # .metadata.nameの値と一致する必要があります
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ include "opendata-map.fullname" . }}-db # .spec.selector.matchLabelsの値と一致する必要があります
+    spec:
+      containers:
+        - name: {{ include "opendata-map.fullname" . }}-db
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+              name: db
+          volumeMounts:
+            - name: {{ include "opendata-map.fullname" . }}-db
+              mountPath: /var/lib/mysql
+          envFrom:
+            - secretRef:
+                name: "{{ .Values.db.env.secretName }}"
+          env:
+            - name: TZ
+              value: "{{ .Values.db.timezone }}"
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "opendata-map.fullname" . }}-db
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- with .Values.db.persistentVolume.storageClass }}
+      storageClassName: "{{ .Values.db.persistentVolume.storageClass }}"
+      {{- end }}
+      resources:
+        requests:
+          storage: 2Gi

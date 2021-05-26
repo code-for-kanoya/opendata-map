@@ -1,0 +1,7 @@
+{
+    "php-cs-fixer.allowRisky": true,
+    "php-cs-fixer.config": ".php_cs;.php_cs.dist;laravel/.php_cs;laravel/.php_cs.dist",
+    "php-cs-fixer.formatHtml": false,
+    "php-cs-fixer.onsave": true,
+    "blade.format.enable": true
+}

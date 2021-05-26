@@ -1,0 +1,73 @@
+#gzip on;
+##gzip_http_version 1.1;
+##gzip_types text/plain
+##            text/xml
+##            text/css
+##            application/xml
+##            application/xhtml+xml
+##            application/rss+xml
+##            application/javascript
+##            application/x-javascript
+##            application/json;
+#gzip_types application/geo+json;
+#gzip_buffers 4 8k;
+#gzip_min_length 1000;
+#gzip_comp_level 1;
+#gzip_proxied off;
+#gzip_disable "MSIE [1-6]\."  "Mozilla/4";
+#gzip_vary off;
+
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name  localhost;
+
+    gzip on;
+    gzip_types text/css text/javascript application/json application/geo+json application/octet-stream;
+    gzip_comp_level 6;
+    gzip_buffers 4 8k;
+    gzip_min_length 1000;
+    gzip_disable "MSIE [1-6]\."  "Mozilla/4";
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.php index.html index.htm;
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on ${APP_SERVER}:9000
+    #
+    location ~ \.php$ {
+       root           /var/workspace/laravel/public;
+       fastcgi_pass   ${APP_SERVER}:9000;
+       fastcgi_index  index.php;
+       fastcgi_param  SCRIPT_FILENAME  $document_root/index.php$fastcgi_script_name;
+       include        fastcgi_params;
+    }
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+

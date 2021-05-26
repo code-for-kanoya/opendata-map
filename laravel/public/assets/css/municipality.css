@@ -1,0 +1,118 @@
+.menu-drawer .btn
+{
+  position: fixed;
+  cursor: pointer;
+}
+.menu-drawer .btn::before
+{
+  bottom: -8px;
+}
+.menu-drawer .btn::after
+{
+  bottom: -16px;
+}
+
+/*鹿屋市*/
+.menu-drawer #_x40_46203
+{
+  top: 607px;
+  left: 985px;
+}
+
+.menu-drawer .content
+{
+  display: table;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  background: #fff;
+  width: 90vw;
+  top: 34px;
+  right: 0;
+  text-align: left;
+}
+@media screen and (min-width: 415px)
+{
+  .menu-drawer .content
+  {
+    width: 350px;
+  }
+}
+.menu-drawer .content .menu
+{
+  height: 900px;
+  overflow-y: auto;
+}
+.menu-drawer .content .menu .item
+{
+  border-bottom: 1px solid #000000;
+  padding: 1rem 0 0 0;
+  text-decoration: none;
+  color: #000000;
+  display: block;
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  font-size: 15px;
+}
+
+.menu-drawer .content
+{
+  position: fixed;
+}
+
+.menu-drawer .btn,
+.menu-drawer .content
+{
+  z-index: 1001;
+}
+
+.menu-drawer #chk
+{
+  display: none;
+}
+.menu-drawer #chk ~ .btn::before
+{
+  display: block;
+}
+.menu-drawer #chk ~ .btn::after
+{
+  display: none;
+}
+
+.menu-drawer #chk:checked ~ .btn::before
+{
+  display: none;
+}
+.menu-drawer #chk:checked ~ .btn::after
+{
+  display: block;
+}
+
+.menu-drawer #chk ~ .content
+{
+  transform: translate(350%, 0);
+  transition: transform 0.3s ease-in-out;
+}
+.menu-drawer #chk:checked ~ .content
+{
+  transform: none;
+}
+
+/*地図*/
+#svgArea svg
+{
+  position: relative;
+  visibility: visible;
+  top: 0px;
+  left: 0px;
+  max-height: 90vh;
+  transform: scale(1);
+}
+
+/*境界線*/
+#svgArea .noEdit
+{
+  fill: none;
+  stroke: #231815;
+  stroke-width: 2;
+}

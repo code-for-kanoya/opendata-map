@@ -1,0 +1,7 @@
+*.*
+!.gitignore
+!*.sample
+!nginx
+!nginx/default.conf.template
+!supervisor.d
+!supervisor.d/*.conf

@@ -1,0 +1,43 @@
+{{- if not .Values.persistentVolume.existingClaim.enable }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-pv-claim
+spec:
+  storageClassName: {{ .Values.persistentVolume.storageClass }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.persistentVolume.size }}
+{{- end }}
+
+---
+{{- if not .Values.openstreetmap.persistentVolume.db.existingClaim.enable }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-pv-map-db-claim
+spec:
+  storageClassName: {{ .Values.openstreetmap.persistentVolume.db.storageClass }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.openstreetmap.persistentVolume.db.size }}
+{{- end }}
+
+---
+{{- if not .Values.openstreetmap.persistentVolume.tileCache.existingClaim.enable }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-claim
+spec:
+  storageClassName: {{ .Values.openstreetmap.persistentVolume.tileCache.storageClass }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.openstreetmap.persistentVolume.tileCache.size }}
+{{- end }}

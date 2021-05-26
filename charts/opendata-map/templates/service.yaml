@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-nginx
+  labels:
+    {{- include "opendata-map.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.nginx.service.type }}
+  ports:
+    - port: {{ .Values.nginx.service.port }}
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "opendata-map.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-db
+  labels:
+    {{- include "opendata-map.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+      name: http
+  selector:
+    statefulset.kubernetes.io/pod-name: opendata-map-db-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-map
+  labels:
+    {{- include "opendata-map.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.openstreetmap.service.type }}
+  ports:
+    - port: 8080
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "opendata-map-map.selectorLabels" . | nindent 4 }}

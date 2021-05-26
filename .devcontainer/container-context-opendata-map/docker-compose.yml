@@ -1,0 +1,49 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:1.18
+    environment:
+      - APP_SERVER=php-fpm
+    ports:
+      - 10080:80
+    volumes:
+      - ./config/nginx/default.conf.template:/etc/nginx/templates/default.conf.template
+      - ../../laravel/public:/usr/share/nginx/html
+  php-fpm:
+    build:
+      context: ./build/php
+      dockerfile: ./Dockerfile
+      target: app_base
+      args:
+        VERSION: 7.4-fpm
+        NODE_VERSION: "12.19.0"
+    volumes:
+      - ./config/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ../..:/var/workspace
+      - node_modules:/var/workspace/laravel/node_modules
+
+  db:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    volumes:
+      - db:/var/lib/mysql
+    env_file: ./env/php-apache.env
+    environment:
+      TZ: 'Asia/Tokyo'
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.0.2
+    ports:
+      - 8080:80
+    env_file: ./env/php-apache.env
+  redis:
+    image: redis:latest
+    volumes:
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/redis:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+volumes:
+  db:
+  node_modules:

@@ -1,0 +1,50 @@
+/* for top-page */
+.header_title {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #3d9aa9;
+}
+
+h3 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.section,
+.section-turquoise {
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.section-turquoise {
+    background-color: #3d9aa9;
+    color: #fff;
+}
+.section {
+    color: #3d9aa9;
+}
+.content {
+    font-size: 0.9em;
+}
+.reference-turquoise a {
+    color: #fff;
+}
+.reference a {
+  color: #3d9aa9;
+}
+
+a.btn-custom {
+    color: #fff;
+    background-color: #91cd99;
+}
+a.btn-custom:hover {
+    color: #fff;
+    background: #80bc88;
+}
+i.far {
+  margin-right: 1rem;
+}
+
+.copyright {
+    text-align: center;
+}

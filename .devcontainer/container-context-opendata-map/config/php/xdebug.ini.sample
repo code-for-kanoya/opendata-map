@@ -1,0 +1,14 @@
+[xdebug]
+; xdebug.default_enable=1
+xdebug.remote_enable=1
+xdebug.remote_port=9001
+xdebug.remote_handler=dbgp
+xdebug.remote_mode=req
+; idekey value is specific to vscode
+; xdebug.idekey=xdebug.vscode
+; Optional: Set to true to always auto-start xdebug
+xdebug.remote_autostart=true
+
+; for Container
+xdebug.remote_host=127.0.0.1
+xdebug.remote_connect_back=0

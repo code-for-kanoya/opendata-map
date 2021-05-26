@@ -1,0 +1,4 @@
+.devcontainer/container-context-opendatamap/config/php/xdebug.ini
+.devcontainer/container-context-opendatamap/config/redis/redis.conf
+.devcontainer/container-context-opendatamap/data/redis/dump.rdb
+.devcontainer/container-context-opendatamap/env/php-apache.env

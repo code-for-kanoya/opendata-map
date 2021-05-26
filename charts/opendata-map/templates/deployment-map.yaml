@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-map
+  labels:
+    {{- include "opendata-map.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.openstreetmap.autoscaling.enabled }}
+  replicas: {{ .Values.openstreetmap.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "opendata-map-map.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.openstreetmap.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "opendata-map-map.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.openstreetmap.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "opendata-map.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.openstreetmap.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.openstreetmap.securityContext | nindent 12 }}
+          image: "{{ .Values.openstreetmap.image.repository }}:{{ .Values.openstreetmap.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.openstreetmap.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          resources:
+            {{- toYaml .Values.openstreetmap.resources | nindent 12 }}
+          env:
+            {{- with .Values.openstreetmap.environment }}
+              {{- range . }}
+              - name: {{ .name }}
+                value: "{{ .value }}"
+              {{- end }}
+            {{- end }}
+          volumeMounts:
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-db-storage
+              mountPath: "/var/lib/postgresql/12/main"
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-storage
+              mountPath: "/var/lib/mod_tile"
+          command: ["/run.sh"]
+          args: ["run"]
+      initContainers:
+        - name: init-mapdata
+          image: "{{ .Values.openstreetmap.image.repository }}:{{ .Values.openstreetmap.image.tag | default .Chart.AppVersion }}"
+          command: ['sh', '-c', 
+                    "curl -o /data.osm.pbf https://download.geofabrik.de/asia/japan/kyushu-latest.osm.pbf && curl -o /data.poly https://download.geofabrik.de/asia/japan/kyushu.poly && /run.sh import"]
+          env:
+            {{- with .Values.openstreetmap.environment }}
+              {{- range . }}
+              - name: {{ .name }}
+                value: "{{ .value }}"
+              {{- end }}
+            {{- end }}
+          volumeMounts:
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-db-storage
+              mountPath: "/var/lib/postgresql/12/main"
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-storage
+              mountPath: "/var/lib/mod_tile"
+      volumes:
+        - name: {{ include "opendata-map.fullname" . }}-pv-map-db-storage
+          persistentVolumeClaim:
+            {{- if .Values.openstreetmap.persistentVolume.db.existingClaim.enable }}
+            claimName: {{ .Values.openstreetmap.persistentVolume.db.existingClaim.name }}
+            {{- else }}
+            claimName: {{ include "opendata-map.fullname" . }}-pv-map-db-claim
+            {{- end }}
+        - name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-storage
+          persistentVolumeClaim:
+            {{- if .Values.openstreetmap.persistentVolume.tileCache.existingClaim.enable }}
+            claimName: {{ .Values.openstreetmap.persistentVolume.tileCache.existingClaim.name }}
+            {{- else }}
+            claimName: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-claim
+            {{- end }}
+      {{- with .Values.openstreetmap.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.openstreetmap.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.openstreetmap.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

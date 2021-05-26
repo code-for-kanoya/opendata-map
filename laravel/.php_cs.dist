@@ -1,0 +1,21 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('vender')
+    ->exclude('bootstrap/cache')
+    ->exclude('storage/framework')
+    ->notPath('_ide_helper_models.php')
+    ->notPath('_ide_helper.php')
+    ->notPath('.phpstorm.meta.php')
+    ->in(__DIR__);
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@PSR1' => true,
+        '@PSR2' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'strict_param' => false,
+        'psr0' => false,
+        'psr4' => true,
+    ])
+    ->setFinder($finder);
