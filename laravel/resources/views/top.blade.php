@@ -46,10 +46,14 @@
                             <div>マップに表示するサービスです。</div>
                         </p>
                         <p>
+                            <div>以下に、このサービスのソースコードを公開しています。<div>
+                            <a class="service-link" href="https://github.com/code-for-kanoya/opendata-map.git" role="button" target="_blank" rel="noopener noreferrer">https://github.com/code-for-kanoya/opendata-map.git</a>
+                        </p>
+                        <p>
                             <div>最終データ更新日：2021年04月27日</div>
                         </p>
                     </div>
-                    <a class="btn btn-custom btn-lg" href="{{ url('/map') }}" role="button"  target="_blank" rel="noopener noreferrer">マップを使う</a>
+                    <a class="btn btn-custom btn-lg" href="{{ url('/map') }}" role="button" target="_blank" rel="noopener noreferrer">マップを使う</a>
                 </div>
             </section>
 
