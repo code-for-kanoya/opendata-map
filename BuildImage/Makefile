@@ -17,11 +17,11 @@ build-base:
 	--platform $(PLATFORMS) \
 	--push \
 	-t $(REPOSITOTY)$(BASE_IMAGE):$(BASE_IMAGE_TAG) \
-	-f ../.devcontainer/container-context/build/php/Dockerfile \
+	-f ../.devcontainer/container-context-opendata-map/build/php/Dockerfile \
 	--target app_base \
 	--build-arg VERSION=$(VERSION) \
   --build-arg NODE_VERSION=$(NODE_VERSION) \
-	../.devcontainer/container-context/build/php
+	../.devcontainer/container-context-opendata-map/build/php
 
 build-production:
 	docker buildx build \
