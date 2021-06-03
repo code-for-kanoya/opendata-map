@@ -17,7 +17,7 @@ services:
       target: app_base
       args:
         VERSION: 7.4-fpm
-        NODE_VERSION: "12.19.0"
+        NODE_VERSION: "14.17.0"
     volumes:
       - ./config/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
       - ../..:/var/workspace
