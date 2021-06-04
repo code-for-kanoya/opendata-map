@@ -255,6 +255,13 @@ nginx:
             listen  [::]:80;
             server_name  localhost;
 
+            gzip on;
+            gzip_types text/css text/javascript application/json application/geo+json application/octet-stream;
+            gzip_comp_level 6;
+            gzip_buffers 4 8k;
+            gzip_min_length 1000;
+            gzip_disable "MSIE [1-6]\."  "Mozilla/4";
+
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
 
