@@ -19,7 +19,7 @@ Route::get('/', 'TopController@index')->name('top');
 // マップ
 Route::group(['prefix' => 'map'], function () {
     // 都道府県
-    Route::get('/', 'MapController@index')->name('map');
+    Route::get('/{id?}/{code?}', 'MapController@index')->name('map');
     // 市区町村
     Route::post('/municipality', 'MapController@postMunicipality')->name('postMunicipality');
     // データセット
@@ -29,4 +29,6 @@ Route::group(['prefix' => 'map'], function () {
         // 詳細情報
         Route::post('/{name}', 'MapController@postDatasetDetail')->name('postDatasetDetail');
     });
+    // ランキング
+    Route::post('/ranking', 'MapController@postRanking')->name('postRanking');
 });

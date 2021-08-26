@@ -21,19 +21,26 @@ h3 {
     color: #fff;
 }
 .section-turquoise a {
-  color: #fff;
+    color: #fff;
 }
 .section {
+    color: #3d9aa9;
+}
+.section a {
     color: #3d9aa9;
 }
 .content {
     font-size: 0.9em;
 }
-.reference-turquoise a {
-    color: #fff;
+section a.link {
+    text-decoration: underline;
 }
-.reference a {
-  color: #3d9aa9;
+section a.accordion {
+    text-decoration: none;
+}
+.content-list {
+    display: inline-block;
+    text-align: left;
 }
 
 a.btn-custom {
@@ -45,7 +52,7 @@ a.btn-custom:hover {
     background: #80bc88;
 }
 i.far {
-  margin-right: 1rem;
+    margin-right: 1rem;
 }
 
 .copyright {

@@ -6,7 +6,8 @@
 @section('css')
 @endsection
 
-<body>
+{{-- <body> --}}
+@section('content')
     <div class="container">
         <div class="header_title">
             <h1>オープンデータはどけ行ったけ？-WHERE DOES MY DATA GO?-</h1>
@@ -18,36 +19,32 @@
                     <h3>このサービスについて</h3>
                     <div class="content">
                         <p>
-                            <div>
-                                九州を中心としたBODIK ODCS
-                                <sup id="cite-ref-1" class="reference-turquoise">
-                                    <a href="#bodik-odcs">[1]</a>
-                                </sup>
-                                という
-                            </div>
+                            <div>九州を中心とした<a class="bodik-odcs-link link" data-toggle="collapse" href="#bodik-odcs-content" aria-controls="#bodik-odcs-content" aria-expanded="false">BODIK ODCS</a>という</div>
                             <div>オープンデータカタログサイトがあり、</div>
                             <div>多くの市区町村が参画しています。</div>
                         </p>
                         <p>
                             <div>ここに公開されている</div>
-                            <div>
-                                オープンデータ
-                                <sup id="cite-ref-2" class="reference-turquoise">
-                                    <a href="#opendata">[2]</a>
-                                </sup>
-                                （推奨データセット
-                                <sup id="cite-ref-3" class="reference-turquoise">
-                                    <a href="#dataset">[3]</a>
-                                </sup>
-                                ）を
-                            </div>
+                            <div><a class="opendata-link link" data-toggle="collapse" href="#opendata-content" aria-controls="#opendata-content" aria-expanded="false">オープンデータ</a>（<a class="dataset-link link" data-toggle="collapse" href="#dataset-content" aria-controls="#dataset-content" aria-expanded="false">推奨データセット</a>）を</div>
                             <div>クローリングツールにより取得し、</div>
                             <div>各市区町村のオープンデータの整備状況を</div>
                             <div>マップに表示するサービスです。</div>
                         </p>
                         <p>
                             <div>以下に、このサービスのソースコードを公開しています。<div>
-                            <a class="service-link" href="https://github.com/code-for-kanoya/opendata-map.git" role="button" target="_blank" rel="noopener noreferrer">https://github.com/code-for-kanoya/opendata-map.git</a>
+                            <a class="service-link link" href="https://github.com/code-for-kanoya/opendata-map.git" role="button" target="_blank" rel="noopener noreferrer">https://github.com/code-for-kanoya/opendata-map.git</a>
+                        </p>
+                        <p>
+                            <div>このサービスの推奨ブラウザは以下のとおりです。</div>
+                            <div>いずれのブラウザも最新版をご利用ください。</div>
+                            <ul class="content-list">
+                                <li>Google Chrome</li>
+                                <li>Microsoft Edge</li>
+                                <li>Safari</li>
+                            </ul>
+                        </p>
+                        <p>
+                          <div>サービス名「オープンデータはどけ行ったけ？」は、鹿屋弁です。</div>
                         </p>
                         <p>
                             <div>最終データ更新日：2021年04月27日</div>
@@ -59,8 +56,10 @@
 
             <section id="opendata" class="section">
                 <div class="container">
-                    <h3>オープンデータとは？</h3>
-                    <div class="content">
+                    <a class="accordion" data-toggle="collapse" href="#opendata-content" aria-controls="#opendata-content" aria-expanded="false">
+                      <h3>オープンデータとは？</h3>
+                    </a>
+                    <div id="opendata-content" class="content collapse" data-parent="#opendata">
                         <p>
                             <div>国、地方公共団体及び事業者が</div>
                             <div>保有する官民データのうち、国民誰もが</div>
@@ -76,15 +75,17 @@
                                 <div>③無償で利用できるもの</div>
                             </p>
                         </div>
+                        <a class="link" href="https://cio.go.jp/policy-opendata#ketteibunsyo" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                     </div>
-                    <a class="btn btn-custom btn-lg" href="https://cio.go.jp/policy-opendata#ketteibunsyo" role="button" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                 </div>
             </section>
 
             <section id="dataset" class="section-turquoise">
                 <div class="container">
-                    <h3>推奨データセットとは？</h3>
-                    <div class="content">
+                    <a class="accordion" data-toggle="collapse" href="#dataset-content" aria-controls="#dataset-content" aria-expanded="false">
+                        <h3>推奨データセットとは？</h3>
+                    </a>
+                    <div id="dataset-content" class="content collapse" data-parent="#dataset">
                         <p>
                             <div>オープンデータの公開とその利活用を</div>
                             <div>促進することを目的とし、</div>
@@ -92,29 +93,33 @@
                             <div>公開するデータの作成にあたり準拠すべき</div>
                             <div>ルールやフォーマット等を取りまとめたものです。</div>
                         </p>
+                        <a class="link" href="https://cio.go.jp/policy-opendata#dataset" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                     </div>
-                    <a class="btn btn-custom btn-lg" href="https://cio.go.jp/policy-opendata#dataset" role="button" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                 </div>
             </section>
 
             <section id="bodik-odcs" class="section">
                 <div class="container">
-                    <h3>BODIK ODCSとは？</h3>
-                    <div class="content">
+                    <a class="accordion" data-toggle="collapse" href="#bodik-odcs-content" aria-controls="#bodik-odcs-content" aria-expanded="false">
+                        <h3>BODIK ODCSとは？</h3>
+                    </a>
+                    <div id="bodik-odcs-content" class="content collapse" data-parent="#bodik-odcs">
                         <p>
                             <div>地方自治体がオープンデータを公開するための</div>
                             <div>データカタログサイトを無償で提供する</div>
                             <div>クラウドサービスのことです。</div>
                         </p>
+                        <a class="link" href="https://odcs.bodik.jp/" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                     </div>
-                    <a class="btn btn-custom btn-lg" href="https://odcs.bodik.jp/" role="button" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                 </div>
             </section>
 
             <section id="municipality-efforts" class="section-turquoise">
                 <div class="container">
-                    <h3>自治体の取組について</h3>
-                    <div class="content">
+                    <a class="accordion" data-toggle="collapse" href="#municipality-efforts-content" aria-controls="#municipality-efforts-content" aria-expanded="false">
+                        <h3>自治体の取組について</h3>
+                    </a>
+                    <div id="municipality-efforts-content" class="content collapse" data-parent="#municipality-efforts">
                         <p>
                             <div>「世界最先端ＩＴ国家創造宣言・</div>
                             <div>官民データ活用推進基本計画」</div>
@@ -126,15 +131,17 @@
                             <div>令和3年04月12日時点の取組率は、</div>
                             <div>約65%（1,157／1,788自治体）です。</div>
                         </p>
+                        <a class="link" href="https://cio.go.jp/policy-opendata#jichitaisuu" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                     </div>
-                    <a class="btn btn-custom btn-lg" href="https://cio.go.jp/policy-opendata#jichitaisuu" role="button" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                 </div>
             </section>
 
-            <section id="C4K" class="section">
+            <section id="c4k" class="section">
                 <div class="container">
-                    <h3>Code for Kanoyaとは？</h3>
-                    <div class="content">
+                    <a class="accordion" data-toggle="collapse" href="#c4k-content" aria-controls="#c4k-content" aria-expanded="false">
+                        <h3>Code for Kanoyaとは？</h3>
+                    </a>
+                    <div id="c4k-content" class="content collapse" data-parent="#c4k">
                         <p>
                             <div>シビックテック（Civic Tech）の考えに基づき、</div>
                             <div>Codeの力で地域課題の解決を目指す</div>
@@ -148,8 +155,8 @@
                             <div>テクノロジーを活用した市民の手による</div>
                             <div>地域課題の解決方法のことです。</div>
                         </p>
+                        <a class="link" href="https://code-for-kanoya.github.io/" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                     </div>
-                    <a class="btn btn-custom btn-lg" href="https://code-for-kanoya.github.io/" role="button" target="_blank" rel="noopener noreferrer">詳細はこちら</a>
                 </div>
             </section>
         </div>
@@ -160,4 +167,35 @@
             @ 2021 Code for Kanoya
         </p>
     </footer>
-</body>
+@endsection
+{{-- </body> --}}
+
+@section('scripts')
+    <script type="text/javascript">
+        $(function() {
+            // クリックイベントを実装
+            $('.bodik-odcs-link').on('click', function(e) {
+                var top = $('#bodik-odcs').offset().top;
+                scrollTop(top);
+            });
+
+            // クリックイベントを実装
+            $('.opendata-link').on('click', function(e) {
+                var top = $('#opendata').offset().top;
+                scrollTop(top);
+            });
+
+            // クリックイベントを実装
+            $('.dataset-link').on('click', function(e) {
+                var top = $('#dataset').offset().top;
+                scrollTop(top);
+            });
+
+            function scrollTop(top) {
+                $('html,body').animate({
+                    scrollTop: top
+                } ,500);
+            }
+        });
+    </script>
+@endsection

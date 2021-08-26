@@ -30,6 +30,7 @@
         "leaflet-sprite": "^1.0.0",
         "leaflet.awesome-markers": "^2.0.5",
         "leaflet.defaultextent": "0.0.3",
-        "leaflet.locatecontrol": "^0.73.0"
+        "leaflet.locatecontrol": "^0.73.0",
+        "vue-tour": "^2.0.0"
     }
 }

@@ -4,8 +4,11 @@
         <inputform-component
             v-bind:input-id="inputId"
             v-bind:prefs-data="prefsData"
+            v-bind:pref-id="prefId"
+            v-bind:municipality-code="municipalityCode"
             v-bind:is-select-data="isSelectData"
             v-bind:select-data-name="selectDataName"
+            v-bind:bus="bus"
             v-on:init-municipality="initMunicipality"
             v-on:set-marker="setMarker"
             v-on:click-marker="clickMarker"
@@ -18,8 +21,14 @@
             v-bind:info-dataset="infoDataset"
             v-bind:info-data="infoData"
             v-on:disp-info="dispDatasetDetailInfo"
-            v-if="isInfoShow">
+            v-if="isInfoShow"
+            ref="information">
         </information-component>
+        <tour-component
+            v-bind:v-step-id0="vStepId0"
+            v-bind:bus="bus"
+            v-if="municipalityCode === undefined">
+        </tour-component>
     </div>
 </template>
 
@@ -37,12 +46,13 @@
     import axios from 'axios'
     import inputformComponent from './InputFormComponent.vue'
     import InformationComponent from './InformationComponent.vue'
+    import TourComponent from './TourComponent.vue'
 
     // アイコンサイズの設定など
-    L.Icon.Default.imagePath = 'images/vendor/leaflet/dist/'
+    L.Icon.Default.imagePath = '/images/vendor/leaflet/dist/'
     var LeafIcon = L.Icon.extend({
         options: {
-            shadowUrl: 'images/vendor/leaflet/dist/marker-shadow.png', // シャドウ付きアイコンを使う場合は、削除もしくはコメントアウト
+            shadowUrl: '/images/vendor/leaflet/dist/marker-shadow.png', // シャドウ付きアイコンを使う場合は、削除もしくはコメントアウト
             shadowSize: [41, 41], // シャドウ付きアイコンを使う場合は、削除もしくはコメントアウト
             shadowAnchor: [10, 41], // シャドウ付きアイコンを使う場合は、削除もしくはコメントアウト
             iconSize: [25, 41], // シャドウ付きアイコンを使う場合は、[41, 41]に設定
@@ -62,16 +72,24 @@
         components: {
             inputformComponent,
             InformationComponent,
+            TourComponent,
         },
 
         props: {
             prefsData: {
                 name: 'prefsData',
             },
+            prefId: {
+                name: 'prefId',
+            },
+            municipalityCode: {
+                name: 'municipalityCode',
+            },
         },
 
         data: function() {
             return {
+                bus: new Vue(),
                 inputId: '',
                 infoDataset: '',
                 myMap: null, // マップ
@@ -91,11 +109,26 @@
                 isInfoShow: false, // データセット一覧表示可否
                 isSelectData: false, // データセット選択フラグ
                 selectDataName: '', // データセット選択名
+                vStepId0: '', // チュートリアル１
             };
         },
 
         mounted: function() {
             this.initMap();
+
+            if (this.prefId !== undefined) {
+                var selectPref = document.getElementById('select-pref');
+                var selectMunicipality = document.getElementById('select-municipality');
+
+                this.$refs.inputform.selectedPref = this.prefId;
+                selectPref.classList.add('select-code');
+                if (this.municipalityCode !== undefined) {
+                    this.$refs.inputform.selectedMunicipality = this.municipalityCode;
+                    selectMunicipality.classList.add('select-code');
+                }
+
+                this.$refs.inputform.selectPrefecture(true);
+            }
         },
 
         methods: {
@@ -107,6 +140,7 @@
 
                 this.inputId = 'input-id';
                 this.infoDataset = 'info-dataset';
+                this.vStepId0 = '#prefecture';
 
                 // Mapの基本設定
                 if (window.parent.screen.width > 567) {
@@ -121,8 +155,8 @@
                 this.myMap = L.map('map', {
                     center: [latitude, longitude],
                     zoom: zoomlevel,
-                    zoomControl: false,
                 });
+                this.myMap.zoomControl.setPosition('bottomright');
 
                 // OSMレイヤー追加
                 L.tileLayer('https://opendata-map-base.gcom-lab.com/tile/{z}/{x}/{y}.png', {
@@ -131,7 +165,7 @@
 
                 // 県境GeoJsonの読み込み
                 axios
-                    .get('./assets/json/prefectures.geojson')
+                    .get('/assets/json/prefectures.geojson')
                     .then(function (json) {
                         addDataToMap(this.myMap, json.data);
                     }.bind(this));
@@ -236,8 +270,11 @@
 
             // 市区町村境初期処理
             initMunicipality: function(prefectureData, datasetlistData) {
+                var self = this;
                 var prefectureId = 0;
                 var prefGeoJson = '';
+
+                this.dispLoading('');
 
                 // 自治体境をクリアする
                 this.clearMunicipalityCoordinates();
@@ -289,11 +326,14 @@
                 }
 
                 axios
-                    .get('./assets/json/' + prefGeoJson)
+                    .get('/assets/json/' + prefGeoJson)
                     .then(function (json) {
                         addDataToMap(this.myMap, json.data);
                     }
-                    .bind(this));
+                    .bind(this))
+                    .finally(function () {
+                        self.removeLoading();
+                    });
 
                 // 自治体情報の各データ追加処理
                 function addDataToMap(map, data) {
@@ -360,7 +400,7 @@
                             case 'dataset14':
                                 if (data[item] === '〇') {
                                     score = score + 6;
-                                } else if (data[item] === '異' || data[item] === '複') {
+                                } else if (data[item] === '異' || data[item] === '複' || data[item] === '不') {
                                     score = score + 3;
                                 }
                                 break;
@@ -442,7 +482,7 @@
 
                 municipalityData.forEach(function(item) {
                     // マーカー設定（青）
-                    var defaultIcon = new LeafIcon({iconUrl: 'images/vendor/leaflet/dist/marker-icon.png'});
+                    var defaultIcon = new LeafIcon({iconUrl: '/images/vendor/leaflet/dist/marker-icon.png'});
                     self.hallMarkers[i] = L.marker([item.latitude,item.longitude],{icon: defaultIcon,});
                     self.hallMarkers[i].addTo(this.myMap);
                     self.hallMarkers[i].bindTooltip(item.name);
@@ -505,38 +545,24 @@
                 });
 
                 // 選択自治体のマーカーの色を変更（青→赤）
-                var townHallIcon = new LeafIcon({iconUrl: 'images/vendor/icon/Red.png'});
+                var townHallIcon = new LeafIcon({iconUrl: '/images/vendor/icon/Red.png'});
                 self.hallMarkers[index].setIcon(townHallIcon);
                 self.hallMarkers[index].select = true;
 
                 // 市区町村リストボックスの値を選択マーカーと同じにする
                 this.$refs.inputform.clickMapMarker(data.code);
+                // ランキング表示
+                if (this.$refs.information !== undefined) {
+                    this.$refs.information.getRankingResult(data.code);
+                }
 
                 // データセット一覧データ設定
-                self.infoData.municipalityCode = data.code;
-                self.infoData.municipalityName = data.name;
-                self.infoData.latitude = data.latitude;
-                self.infoData.longitude = data.longitude;
-                self.infoData.score = data.score;
-                self.infoData.exsitSite = data.existsite;
-                self.infoData.dataset[1] = data.dataset01;
-                self.infoData.dataset[2] = data.dataset02;
-                self.infoData.dataset[3] = data.dataset03;
-                self.infoData.dataset[4] = data.dataset04;
-                self.infoData.dataset[5] = data.dataset05;
-                self.infoData.dataset[6] = data.dataset06;
-                self.infoData.dataset[7] = data.dataset07;
-                self.infoData.dataset[8] = data.dataset08;
-                self.infoData.dataset[9] = data.dataset09;
-                self.infoData.dataset[10] = data.dataset10;
-                self.infoData.dataset[11] = data.dataset11;
-                self.infoData.dataset[12] = data.dataset12;
-                self.infoData.dataset[13] = data.dataset13;
-                self.infoData.dataset[14] = data.dataset14;
-                self.infoData.url = data.url;
+                self.infoData = data;
 
                 // データセット一覧の表示
                 self.isInfoShow = true;
+
+                history.pushState(null, null, '/map/'+this.$refs.inputform.selectedPref+'/'+data.code);
             },
 
             // 検索画面の入力処理
@@ -618,8 +644,12 @@
                     });
                 }
 
+                // データセットが、地域・年齢別人口 or オープンデータ一覧のとき、処理を抜ける
+                if (datasetCode === 11 || datasetCode === 14) {
+                    return;
+                }
+
                 var content = '';
-                var contents = '';
                 var popup;
 
                 // マーカー設定
@@ -628,40 +658,20 @@
                     // ポップアップ内容設定
                     content = setContent(datasetCode, item);
 
-                    switch (datasetCode) {
-                        case 11:
-                        case 14:
-                            contents = contents + content;
-                            break;
-                        default:
-                            // ポップアップオブジェクトの生成
-                            popup = L.popup({
-                                        maxHeight: 300,
-                                    })
-                                    .setContent(content);
-                            // マーカー設定（緑）
-                            var plotIcon = new LeafIcon({iconUrl: 'images/vendor/icon/ForestGreen.png'});
-                            self.datasetMarkers[i] = L.marker([item.latitude, item.longitude], {icon: plotIcon});
-                            self.datasetMarkers[i].addTo(self.myMap);
-                            self.datasetMarkers[i].bindTooltip(item.name);
-                            self.datasetMarkers[i].bindPopup(popup);
-                            break;
-                    }
+                    // ポップアップオブジェクトの生成
+                    popup = L.popup({
+                                maxHeight: 300,
+                            })
+                            .setContent(content);
+                    // マーカー設定（緑）
+                    var plotIcon = self.setPlotMarker(datasetCode);
+                    self.datasetMarkers[i] = L.marker([item.latitude, item.longitude], {icon: plotIcon});
+                    self.datasetMarkers[i].addTo(self.myMap);
+                    self.datasetMarkers[i].bindTooltip(item.name);
+                    self.datasetMarkers[i].bindPopup(popup);
 
                     i = i + 1;
                 }, this);
-
-                switch (datasetCode) {
-                    case 11:
-                    case 14:
-                        // ポップアップオブジェクトの生成
-                        popup = L.popup({
-                                    maxHeight: 300,
-                                })
-                                .setContent(contents);
-                        // マーカー設定（赤）
-                        targetMarker.bindPopup(popup).openPopup();
-                }
 
                 self.isSelectData = true;
                 self.selectDataName = datasetName;
@@ -700,7 +710,7 @@
                                     +'<div>診療時間：'+self.nvl(item.start_time, '')+'～'+self.nvl(item.end_time, '')+'</div>'
                                     +'<div>診療科目：'+self.nvl(item.clinical_department, '')+'</div>'
                                     +'<div>病床数：'+self.nvl(item.bed_count, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
                                     +'</div>';
                             break;
@@ -709,7 +719,7 @@
                             content ='<div class="dataset-plot-content">'
                                     +'<div>名称：'+self.nvl(item.name, '')+'</div>'
                                     +'<div>分類：'+self.nvl(item.classification, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
                                     +'</div>';
                             break;
@@ -719,7 +729,7 @@
                                     +'<div>名称：'+self.nvl(item.name, '')+'</div>'
                                     +'<div>住所：'+self.nvl(item.address, '')+'</div>'
                                     +'<div>説明：'+self.nvl(item.explanation, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
                                     +'</div>';
                             break;
@@ -732,7 +742,7 @@
                                     +'<div>説明：'+self.nvl(item.explanation, '')+'</div>'
                                     +'<div>場所名称：'+self.nvl(item.place_name, '')+'</div>'
                                     +'<div>住所：'+self.nvl(item.address, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
                                     +'</div>';
                             break;
@@ -741,10 +751,9 @@
                             content ='<div class="dataset-plot-content">'
                                     +'<div>名称：'+self.nvl(item.name, '')+'</div>'
                                     +'<div>住所：'+self.nvl(item.address, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
                                     +'</div>';
-                                    // +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+item.url+'</a></div>'
                             break;
                         case 8:
                             // 公衆トイレ一覧
@@ -788,19 +797,8 @@
                                     +'<div>指定避難所との重複：'+(item.duplicate_designated_shelter == '1' ? '重複している' : '重複していない')+'</div>'
                                     +'<div>想定収容人数：'+self.nvl(item.estimated_capacity, '')+'</div>'
                                     +'<div>対象となる町会・自治会：'+self.nvl(item.target_resident_association, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
-                                    +'</div>';
-                            break;
-                        case 11:
-                            // 地域・年齢別人口
-                            content ='<div class="dataset-plot-content">'
-                                    +'<p>'
-                                    +'<div>地域名：'+self.nvl(item.area_name, '')+'</div>'
-                                    +'<div>総人口：'+self.nvl(item.total_population, '')+'</div>'
-                                    +'<div>男性：'+self.nvl(item.total_male, '')+'</div>'
-                                    +'<div>女性：'+self.nvl(item.total_female, '')+'</div>'
-                                    +'</p>'
                                     +'</div>';
                             break;
                         case 12:
@@ -810,7 +808,7 @@
                                     +'<div>住所：'+self.nvl(item.address, '')+'</div>'
                                     +'<div>電話番号：'+self.nvl(item.phone_number, '')+'</div>'
                                     +'<div>利用可能曜日：'+self.nvl(item.available_day, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
                                     +'</div>';
                             break;
@@ -828,19 +826,8 @@
                                     +'<div>利用可能曜日：'+self.nvl(item.available_day, '')+'</div>'
                                     +'<div>開始時間：'+self.nvl(item.start_time, '')+'～'+self.nvl(item.end_time, '')+'</div>'
                                     +'<div>一時預かりの有無：'+self.nvl(item.existence_temporary_custody, '')+'</div>'
-                                    +'<div>ＵＲＬ：'+self.nvl(item.url, '')+'</div>'
+                                    +'<div>ＵＲＬ：<a href="'+item.url+'" target="_blank" rel="noopener noreferrer">'+self.nvl(item.url, '')+'</a></div>'
                                     +'<div>備考：'+self.nvl(item.note, '')+'</div>'
-                                    +'</div>';
-                            break;
-                        case 14:
-                            // オープンデータ一覧
-                            content ='<div class="dataset-plot-content">'
-                                    +'<p>'
-                                    +'<div>データ名称：'+self.nvl(item.name, '')+'</div>'
-                                    +'<div>データ形式：'+self.nvl(item.format, '')+'</div>'
-                                    +'<div>分類：'+self.nvl(item.classification, '')+'</div>'
-                                    +'<div>最終更新日：'+self.nvl(item.last_update_date, '')+'</div>'
-                                    +'</p>'
                                     +'</div>';
                             break;
                     }
@@ -865,6 +852,151 @@
                 }
 
                 return ret;
+            },
+
+            setPlotMarker: function(datasetCode) {
+                var marker;
+
+                switch (datasetCode) {
+                    case 1:
+                        // AED設置箇所一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset01',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-heartbeat"></i>',
+                        });
+                        break;
+                    case 2:
+                        // 介護サービス事業所一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset02',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-wheelchair"></i>',
+                        });
+                        break;
+                    case 3:
+                        // 医療機関一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset03',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-clinic-medical"></i>',
+                        });
+                        break;
+                    case 4:
+                        // 文化財一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset04',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-torii-gate"></i>',
+                        });
+                        break;
+                    case 5:
+                        // 観光施設一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset05',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-landmark"></i>',
+                        });
+                        break;
+                    case 6:
+                        // イベント一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset08',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-users"></i>',
+                        });
+                        break;
+                    case 7:
+                        // 公衆無線LANアクセスポイント一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset07',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-wifi"></i>',
+                        });
+                        break;
+                    case 8:
+                        // 公衆トイレ一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset08',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-restroom"></i>',
+                        });
+                        break;
+                    case 9:
+                        // 消防水利施設一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset08',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-fire-extinguisher"></i>',
+                        });
+                        break;
+                    case 10:
+                        // 指定緊急避難場所一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset08',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-running"></i>',
+                        });
+                        break;
+                    case 12:
+                        // 公共施設一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset04',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-building"></i>',
+                        });
+                        break;
+                    case 13:
+                        // 子育て施設一覧
+                        marker = L.divIcon({
+                            className: 'marker-plot dataset08',
+                            iconSize: [25, 41],
+                            iconAnchor: [7, 20],
+                            popupAnchor: [3, -20],
+                            html: '<i class="fas fa-baby"></i>',
+                        });
+                        break;
+                }
+
+                return marker;
+            },
+
+            dispLoading: function(msg) {
+                if (msg === undefined) {
+                    msg = "";
+                }
+
+                if ($('#loading').length === 0) {
+                    $('body').append("<div id='loading'></div>");
+                    $('#loading').append("<div class='loader'></div>");
+                    $('.loader').append("<i class='fas fa-spinner fa-5x'></i>");
+                }
+            },
+
+            removeLoading: function() {
+                $("#loading").remove();
             },
         }
     }
@@ -903,6 +1035,24 @@
     .dataset-plot-content {
         overflow-wrap: break-word;
         word-wrap: break-word;
+    }
+    .marker-plot {
+        position: absolute;
+        left: -5px;
+        bottom: 0px;
+        font-size: 20px;
+        color: white;
+    }
+    .marker-plot i {
+        background-color: forestgreen;
+        border-radius: 50%;
+        text-align: center;
+        width: 30px;
+        height: 30px;
+    }
+    .marker-plot i::before {
+        padding: 0;
+        line-height: 30px;
     }
 
     /* ヘルプ */
@@ -952,6 +1102,35 @@
     @media screen and (max-width: 576px) {
         .leaflet-control-window {
             width: 50%;
+        }
+    }
+
+    /* Now Loading */
+    #loading {
+        display: table;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 20000;
+        color: #fff;
+        background-color: black;
+        opacity: 0.6;
+    }
+    .loader {
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+        top: 50%;
+        animation: spin 1s ease-in infinite;
+    }
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
         }
     }
 </style>

@@ -18,6 +18,11 @@ use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use App\Models\DataSetDesignatedEmergencyEvacuationSite;
 
 /**
+ * データセット一覧データDBモデルクラス
+ */
+use App\Models\DataSetList;
+
+/**
  * 更新通知処理用コールバックインターフェース
  */
 use App\Util\ProgressCallbackInterface;
@@ -226,6 +231,9 @@ class DatasetDesignatedEmergencyEvacuationSiteCSVImporter
                         }
                     }
                     if ($titleCount < 15) {
+                        // データ不備のため、データセットリストデータの更新を行う。
+                        $this->updateDatasetList($code);
+
                         // 必須列タイトルが足りない為、スキップ
                         $message = DatasetCSVTitleName::DESIGNATED_EMERGENCY_EVACUATION_SITE." : {$dirName}-> format no match!";
                         \Log::error($message);
@@ -275,7 +283,7 @@ class DatasetDesignatedEmergencyEvacuationSiteCSVImporter
                     $record->phone_number = $line[$csvTitleTable[DatasetDesignatedEmergencyEvacuationSiteCSVTitleNumber::PHONE_NUMBER]]; // 電話番号
                     $record->extension_number = Arr::get($line, Arr::get($csvTitleTable, DatasetDesignatedEmergencyEvacuationSiteCSVTitleNumber::EXTENSION_NUMBER, '')); // 内線番号
                     $record->code = $line[$csvTitleTable[DatasetDesignatedEmergencyEvacuationSiteCSVTitleNumber::CODE]]; // 市区町村コード
-                    if (empty($record->code)) {
+                    if (empty($record->code) || (strlen($record->code) < 6)) {
                         $record->code = $code; // 都道府県コード又は市区町村コード
                     }
                     $record->prefecture_name = Arr::get($line, Arr::get($csvTitleTable, DatasetDesignatedEmergencyEvacuationSiteCSVTitleNumber::PREFECTURE_NAME, '')); // 都道府県名
@@ -297,6 +305,11 @@ class DatasetDesignatedEmergencyEvacuationSiteCSVImporter
                     $record->url = Arr::get($line, Arr::get($csvTitleTable, DatasetDesignatedEmergencyEvacuationSiteCSVTitleNumber::URL, '')); // URL
                     $record->note = Arr::get($line, Arr::get($csvTitleTable, DatasetDesignatedEmergencyEvacuationSiteCSVTitleNumber::NOTE, '')); // 備考
 
+                    if (($record->latitude === 0) || ($record->longitude === 0)) {
+                        // マップにプロットできないため、データセットリストデータの更新を行う。
+                        $this->updateDatasetList($code);
+                    }
+
                     // 更新処理
                     $record->save();
                 } catch (\Exception $e) {
@@ -311,6 +324,9 @@ class DatasetDesignatedEmergencyEvacuationSiteCSVImporter
 
                         throw new \Exception("UnknownError", 1, $e);
                     }
+
+                    // データ不備のため、データセットリストデータの更新を行う。
+                    $this->updateDatasetList($code);
                 }
             }
 
@@ -323,5 +339,22 @@ class DatasetDesignatedEmergencyEvacuationSiteCSVImporter
                 $this->callbackInterface->progressUpdate($lineNumber);
             }
         }
+    }
+
+    /**
+     * データセットリストデータの更新を行う。
+     *
+     * @param string $code 団体コード
+     * @Exception 読込失敗時例外発生
+     */
+    private function updateDatasetList($code)
+    {
+        // データセット一覧テーブル更新
+        $list = DataSetList::where('code', $code)->first();
+
+        $list->dataset10 = '不';
+
+        // 更新処理
+        $list->save();
     }
 }

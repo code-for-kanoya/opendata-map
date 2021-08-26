@@ -25,6 +25,7 @@ Vue.component('municipalitymap-component', require('./components/MunicipalityMap
 Vue.component('map-component', require('./components/MapComponent.vue').default);
 Vue.component('inputform-component', require('./components/InputFormComponent.vue').default);
 Vue.component('information-component', require('./components/InformationComponent.vue').default);
+Vue.component('tour-component', require('./components/TourComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

@@ -8,7 +8,15 @@
 
 <body>
     <div id="app">
-        <map-component v-bind:prefs-data={{ $prefsData }}></map-component>
+        @if (isset($id))
+            @if (isset($code))
+                <map-component v-bind:prefs-data={{ $prefsData }} v-bind:pref-id={{ $id }} v-bind:municipality-code={{ $code }}></map-component>
+            @else
+                <map-component v-bind:prefs-data={{ $prefsData }} v-bind:pref-id={{ $id }}></map-component>
+            @endif
+        @else
+            <map-component v-bind:prefs-data={{ $prefsData }}></map-component>
+        @endif
     </div>
     <script src="{{ mix('js/app.js') }}"></script>
 </body>

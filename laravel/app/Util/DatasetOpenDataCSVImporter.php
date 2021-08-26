@@ -18,6 +18,11 @@ use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use App\Models\DataSetOpenData;
 
 /**
+ * データセット一覧データDBモデルクラス
+ */
+use App\Models\DataSetList;
+
+/**
  * 更新通知処理用コールバックインターフェース
  */
 use App\Util\ProgressCallbackInterface;
@@ -215,6 +220,9 @@ class DatasetOpenDataCSVImporter
                         }
                     }
                     if ($titleCount < 4) {
+                        // データ不備のため、データセットリストデータの更新を行う。
+                        $this->updateDatasetList($code);
+
                         // 必須列タイトルが足りない為、スキップ
                         $message = DatasetCSVTitleName::OPEN_DATA." : {$dirName}-> format no match!";
                         \Log::error($message);
@@ -248,7 +256,7 @@ class DatasetOpenDataCSVImporter
 
                     // 各列のデータを取得
                     $record->code = Arr::get($line, Arr::get($csvTitleTable, DatasetOpenDataCSVTitleNumber::CODE, '')); // 都道府県コード又は市区町村コード
-                    if (empty($record->code)) {
+                    if (empty($record->code) || (strlen($record->code) < 6)) {
                         $record->code = $code; // 都道府県コード又は市区町村コード
                     }
                     $record->no = Arr::get($line, Arr::get($csvTitleTable, DatasetOpenDataCSVTitleNumber::NUMBER, '')); // NO
@@ -283,6 +291,9 @@ class DatasetOpenDataCSVImporter
 
                         throw new \Exception("UnknownError", 1, $e);
                     }
+
+                    // データ不備のため、データセットリストデータの更新を行う。
+                    $this->updateDatasetList($code);
                 }
             }
 
@@ -295,5 +306,22 @@ class DatasetOpenDataCSVImporter
                 $this->callbackInterface->progressUpdate($lineNumber);
             }
         }
+    }
+
+    /**
+     * データセットリストデータの更新を行う。
+     *
+     * @param string $code 団体コード
+     * @Exception 読込失敗時例外発生
+     */
+    private function updateDatasetList($code)
+    {
+        // データセット一覧テーブル更新
+        $list = DataSetList::where('code', $code)->first();
+
+        $list->dataset14 = '不';
+
+        // 更新処理
+        $list->save();
     }
 }

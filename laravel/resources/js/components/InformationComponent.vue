@@ -9,76 +9,140 @@
             <button type="button" class="score-help">
                 <i class="fas fa-question"></i>
             </button>
-            <label class="info-action-label label-time">2021年04月27日　時点</label>
+            <div class="info-action-label">
+                <span class="icon-rank"><i class="fas fa-crown"></i></span>
+                <div class="rank">{{ ranking }} / 233位</div>
+                <label class="label-time">2021年04月27日　時点</label>
+            </div>
             <div class="dataset row-cols-1 form-inline">
-                <div id="dataset-0">
-                    <div class="col-1 result">{{ infoData.exsitSite }}</div>
-                    <button type="button" class="btn btn-dataset" v-on:click="openBODIKSite(infoData.url)">オープンデータカタログサイト</button>
-                </div>
                 <div id="dataset-1">
-                    <div class="col-1 result">{{ infoData.dataset[1] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset01 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(1)">AED設置箇所一覧</button>
                 </div>
                 <div id="dataset-2">
-                    <div class="col-1 result">{{ infoData.dataset[2] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset02 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(2)">介護サービス事業所一覧</button>
                 </div>
                 <div id="dataset-3">
-                    <div class="col-1 result">{{ infoData.dataset[3] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset03 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(3)">医療機関一覧</button>
                 </div>
                 <div id="dataset-4">
-                    <div class="col-1 result">{{ infoData.dataset[4] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset04 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(4)">文化財一覧</button>
                 </div>
                 <div id="dataset-5">
-                    <div class="col-1 result">{{ infoData.dataset[5] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset05 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(5)">観光施設一覧</button>
                 </div>
                 <div id="dataset-6">
-                    <div class="col-1 result">{{ infoData.dataset[6] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset06 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(6)">イベント一覧</button>
                 </div>
                 <div id="dataset-7">
-                    <div class="col-1 result">{{ infoData.dataset[7] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset07 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(7)">公衆無線LANアクセスポイント一覧</button>
                 </div>
                 <div id="dataset-8">
-                    <div class="col-1 result">{{ infoData.dataset[8] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset08 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(8)">公衆トイレ一覧</button>
                 </div>
                 <div id="dataset-9">
-                    <div class="col-1 result">{{ infoData.dataset[9] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset09 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(9)">消防水利施設一覧</button>
                 </div>
                 <div id="dataset-10">
-                    <div class="col-1 result">{{ infoData.dataset[10] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset10 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(10)">指定緊急避難場所一覧</button>
                 </div>
                 <div id="dataset-11">
-                    <div class="col-1 result">{{ infoData.dataset[11] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset11 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(11)">地域・年齢別人口</button>
                 </div>
                 <div id="dataset-12">
-                    <div class="col-1 result">{{ infoData.dataset[12] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset12 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(12)">公共施設一覧</button>
                 </div>
                 <div id="dataset-13">
-                    <div class="col-1 result">{{ infoData.dataset[13] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset13 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(13)">子育て施設一覧</button>
                 </div>
                 <div id="dataset-14">
-                    <div class="col-1 result">{{ infoData.dataset[14] }}</div>
+                    <div class="col-1 result">{{ infoData.dataset14 }}</div>
                     <button type="button" class="btn btn-dataset" v-on:click="clickDataset(14)">オープンデータ一覧</button>
+                </div>
+                <div id="dataset-0">
+                    <div class="col-1 result">{{ infoData.existsite }}</div>
+                    <div v-if="infoData.existsite === '〇'" class="link-dataset">
+                        <a v-bind:href="infoData.url" target="_blank" rel="noopener noreferrer">オープンデータカタログサイト</a>
+                    </div>
+                    <div v-else-if="infoData.existsite === '✕'" class="link-dataset">
+                        <div>オープンデータカタログサイト</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- モーダルエリアはここから -->
-        <section id="modal-area" class="modal-area">
-            <div id="modal-bg" class="modal-bg"></div>
+        <!-- データセット「地域・年齢別人口」 -->
+        <div id="modal-dataset11" class="modal-area">
+            <div class="modal-bg"></div>
             <div class="modal-wrapper">
-                <div id="close-modal" class="close-modal">
+                <div class="close-modal">
+                    <i class="fas fa-times-circle fa-2x"></i>
+                </div>
+                <div class="modal-contents">
+                    <div class="modal-content-head"></div>
+                    <div class="table">
+                        <div class="tr">
+                            <div class="th">地域名</div>
+                            <div class="th">総人口</div>
+                            <div class="th">男性</div>
+                            <div class="th">女性</div>
+                        </div>
+                        <div v-for="data in datasetData" v-bind:key="data.id" class="tr">
+                            <div class="td">{{ data.area_name }}</div>
+                            <div class="td td-number">{{ formatNumber(data.total_population) }}</div>
+                            <div class="td td-number">{{ formatNumber(data.total_male) }}</div>
+                            <div class="td td-number">{{ formatNumber(data.total_female) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- データセット「オープンデータ一覧」 -->
+        <div id="modal-dataset14" class="modal-area">
+            <div class="modal-bg"></div>
+            <div class="modal-wrapper">
+                <div class="close-modal">
+                    <i class="fas fa-times-circle fa-2x"></i>
+                </div>
+                <div class="modal-contents">
+                    <div class="modal-content-head"></div>
+                    <div class="table">
+                        <div class="tr">
+                            <div class="th">データ名称</div>
+                            <div class="th">データ形式</div>
+                            <div class="th">分類</div>
+                            <div class="th">最終更新日</div>
+                        </div>
+                        <div v-for="data in datasetData" v-bind:key="data.id" class="tr">
+                            <div class="td">{{ data.name }}</div>
+                            <div class="td">{{ data.format }}</div>
+                            <div class="td">{{ data.classification }}</div>
+                            <div class="td">{{ data.score }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スコアヘルプ -->
+        <section id="modal-area" class="modal-area">
+            <div class="modal-bg"></div>
+            <div class="modal-wrapper">
+                <div class="close-modal">
                     <i class="fas fa-times-circle fa-2x"></i>
                 </div>
                 <div class="modal-contents">
@@ -86,6 +150,7 @@
                     <div class="modal-content-title">【データセット判定】</div>
                     <ul>
                         <li>「〇」オープンデータカタログサイトにて、データセットが取得できる</li>
+                        <li>「不」オープンデータカタログサイトにて、データセットが取得できるが、必須項目または緯度・経度のデータが存在しない</li>
                         <li>「異」オープンデータカタログサイトにて、データセット名での検索結果1件以上、データセット名を含む名称が存在しない</li>
                         <!-- RPAで対応後にコメントをはずす -->
                         <!-- <li>「複」オープンデータカタログサイトにて、データセット名での検索結果2件以上、データセット名を含む名称が2件以上</li> -->
@@ -107,6 +172,7 @@
                         <li>オープンデータカタログサイト「〇」：6pt</li>
                         <li>オープンデータカタログサイト「✕」：0pt</li>
                         <li>各データセット「〇」：6pt</li>
+                        <li>各データセット「不」：3pt</li>
                         <li>各データセット「異」：3pt</li>
                         <!-- RPAで対応後にコメントをはずす -->
                         <!-- <li>各データセット「複」：3pt</li> -->
@@ -164,6 +230,33 @@
                 </div>
             </div>
         </section>
+
+        <!-- ランキング -->
+        <!-- <section id="modal-area-rank" class="modal-area-rank">
+            <div class="modal-bg"></div>
+            <div class="modal-wrapper">
+                <div class="close-modal">
+                    <i class="fas fa-times-circle fa-2x"></i>
+                </div>
+                <div class="modal-contents">
+                    <div class="modal-content-head"></div>
+                    <div class="table">
+                        <div class="tr">
+                            <div class="th">順位</div>
+                            <div class="th">都道府県</div>
+                            <div class="th">市区町村</div>
+                            <div class="th">スコア</div>
+                        </div>
+                        <div v-for="rank in rankingData" v-bind:key="rank.municipalityCode" class="tr">
+                            <div class="td">{{ rank.rank }}</div>
+                            <div class="td">{{ rank.prefectureName }}</div>
+                            <div class="td">{{ rank.municipalityName }}</div>
+                            <div class="td">{{ rank.score }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
         <!-- モーダルエリアはここまで -->
     </div>
 </template>
@@ -187,6 +280,8 @@
             return {
                 datasetData: [],
                 datasetName: '',
+                rankingData: [],
+                ranking: 0,
             };
         },
 
@@ -210,14 +305,14 @@
                     $('#map').css('height', infoTop)
                 }
 
-                i = 0;
-                for (i = 0; i < CNT_DATASET; i += 1) {
+                i = 1;
+                for (i = 1; i < CNT_DATASET; i += 1) {
                     changeDatasetButtonColor('#dataset-'+i);
                 }
 
                 $('.info-menu').on('DOMSubtreeModified', function() {
-                    i = 0;
-                    for (i = 0; i < CNT_DATASET; i += 1) {
+                    i = 1;
+                    for (i = 1; i < CNT_DATASET; i += 1) {
                         changeDatasetButtonColor('#dataset-'+i);
                     }
                 });
@@ -326,20 +421,36 @@
                     touched = false;
                 };
 
+                // データセット一覧「地域・年齢別人口」のクリックイベントを実装
+                $('#dataset-11').on('click', function() {
+                    $('#modal-dataset11').fadeIn();
+                });
+
+                // データセット一覧「オープンデータ一覧」のクリックイベントを実装
+                $('#dataset-14').on('click', function() {
+                    $('#modal-dataset14').fadeIn();
+                });
+
                 // スコアヘルプボタンのクリックイベントを実装
                 $('.score-help').on('click', function() {
                     $('#modal-area').fadeIn();
                 });
 
                 // モーダル閉じるボタンのクリックイベントを実装
-                $('#close-modal').on('click', function() {
+                $('.close-modal').on('click', function() {
+                    $('#modal-dataset11').fadeOut();
+                    $('#modal-dataset14').fadeOut();
                     $('#modal-area').fadeOut();
                 });
                 // モーダル背景のクリックイベントを実装
-                $('#modal-bg').on('click', function() {
+                $('.modal-bg').on('click', function() {
+                    $('#modal-dataset11').fadeOut();
+                    $('#modal-dataset14').fadeOut();
                     $('#modal-area').fadeOut();
                 });
             });
+
+            this.getRankingResult(this.infoData.code);
         },
 
         methods: {
@@ -353,7 +464,7 @@
                 var self = this;
 
                 // データセット詳細情報取得
-                await self.getDatasetDetailInfo(self.infoData.municipalityCode, datasetCode);
+                await self.getDatasetDetailInfo(self.infoData.code, datasetCode);
                 // データセット詳細表示
                 this.$emit('disp-info', datasetCode, self.infoData, self.datasetData, self.datasetName);
             },
@@ -437,6 +548,31 @@
                     }
                     .bind(this));
             },
+
+            // ランキング結果取得処理
+            getRankingResult: async function(municipalityCode) {
+                var self = this;
+                var params = new URLSearchParams();
+                var name = '';
+
+                // パラメータ設定処理（なし）
+
+                await axios
+                    .post('/map/ranking', params)
+                    .then(function (response) {
+                        self.rankingData = response.data;
+                    })
+                    .catch(function (err) {
+                      console.log(err);
+                    }
+                    .bind(this));
+
+                self.ranking = self.rankingData.find(target => target.municipalityCode === municipalityCode).rank;
+            },
+
+            formatNumber: function(number) {
+                return String(number).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+            },
         }
     }
 </script>
@@ -450,6 +586,10 @@
         transition: transform 0.3s;
         background-color: white;
         overflow: auto;
+    }
+    .info-menu {
+        position: relative;
+        -webkit-text-size-adjust: 100%;
     }
     .info-menu-top {
         background-color: white;
@@ -498,6 +638,7 @@
         font-style: italic;
     }
     .label-time {
+        display: block;
         margin-top: 1rem;
         margin-right: 0.75rem;
         color: black;
@@ -520,6 +661,21 @@
         margin: 0.375rem 0.75rem;
         padding: 0rem 0rem;
     }
+    .link-dataset {
+        display: inline-block;
+        margin: 0.375rem 0.75rem;
+        padding: 0rem 0rem;
+    }
+
+    .icon-rank {
+        display: block;
+        position: absolute;
+        margin: 4px 0 0 45px;
+    }
+    .rank {
+        position: absolute;
+        margin: 0 0 0 70px;
+    }
 
     @media screen and (max-width: 576px) {
         .info-container {
@@ -539,7 +695,8 @@
     }
 
     /* モーダル */
-    .modal-area {
+    .modal-area,
+    .modal-area-rank {
         display: none;
         position: fixed;
         z-index: 4000;
@@ -587,5 +744,38 @@
         border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 0.3rem;
         padding: 0rem 0.5rem;
+    }
+    .table {
+        margin-top: 2rem;
+        border-top: 1px solid #cccccc;
+        border-left: 1px solid #cccccc;
+    }
+    .table .tr {
+        display: table;
+        width: 100%;
+    }
+    .table .tr .th,
+    .table .tr .td {
+        display: table-cell;
+        width: 25%;
+        padding: 8px 15px;
+        border-right: 1px solid #cccccc;
+        border-bottom: 1px solid #cccccc;
+    }
+    .table .tr .th {
+        background-color: #f5f5f5;
+    }
+    .table .tr .td {
+        background-color: #f5f5f5;
+    }
+    .td-number {
+        text-align: right;
+    }
+
+    @media screen and (max-width: 576px) {
+        .table .tr .th,
+        .table .tr .td {
+            font-size: 0.65rem;
+        }
     }
 </style>

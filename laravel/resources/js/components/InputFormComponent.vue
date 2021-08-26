@@ -30,6 +30,7 @@
 
 <script>
     // ここにjavascriptを記載します
+
     export default {
         props: {
             inputId: {
@@ -48,6 +49,9 @@
                 name: 'selectDataName',
                 type: String,
             },
+            bus: {
+                name: "bus",
+            },
         },
 
         data: function() {
@@ -57,7 +61,7 @@
               selectedMunicipality: '000000', // 自治体リスト初期値
               municipalityData: [], // 自治体情報データ
               isSelectMunicipality: false, // 自治体リスト選択フラグ
-              datasetlistData: [], // データセット一覧データ
+              datasetListData: [], // データセット一覧データ
           };
         },
 
@@ -98,8 +102,13 @@
 
         methods: {
             // 都道府県選択処理
-            selectPrefecture: async function() {
+            selectPrefecture: async function(direct = false) {
                 var self = this;
+                var lSelectedMunicipality = '000000';
+
+                if (direct === true) {
+                    lSelectedMunicipality = self.selectedMunicipality;
+                }
 
                 // 自治体リスト選択フラグクリア
                 self.selectedMunicipality = '000000';
@@ -116,10 +125,24 @@
                     await self.getMunicipalityDataList(self.selectedPrefData.id);
                     // データセット一覧情報
                     await self.getDatasetlist(self.selectedPrefData.id);
+
+                    // データセット一覧情報より、BODIK不参加市区町村を市区町村リストより除外する
+                    self.removeMunicipality();
                 }
 
                 this.$emit('init-municipality', self.selectedPrefData, self.datasetListData);
                 this.$emit('set-marker', self.municipalityData, self.datasetListData);
+
+                if (self.selectedMunicipality === '000000') {
+                    history.pushState(null, null, '/map/'+self.selectedPrefData.id);
+                }
+                self.selectedMunicipality = lSelectedMunicipality;
+
+                if (direct === true && lSelectedMunicipality !== '000000') {
+                    self.selectMunicipality();
+                }
+
+                this.bus.$emit('myTourStart');
             },
 
             //自治体情報データ取得処理
@@ -160,8 +183,23 @@
                     .bind(this));
             },
 
+            // BODIK不参加市区町村除外処理
+            removeMunicipality: function() {
+                var self = this;
+
+                self.datasetListData.forEach(function(dataset) {
+                    if (dataset.url === '') {
+                        self.municipalityData.some(function(municipality, i) {
+                            if (dataset.code == municipality.code) {
+                                self.municipalityData.splice(i, 1);
+                            }
+                        });
+                    }
+                }, this);
+            },
+
             // 市区町村選択処理
-            selectMunicipality: function() {
+            selectMunicipality: async function() {
                 var i = 0;
 
                 // 市区町村リスト選択フラグ
@@ -177,7 +215,7 @@
                 if (this.isSelectMunicipality) {
                     // 各市区町村のマーカーをクリックした時と同じ動作をさせる
                     this.municipalityData.forEach(function(item) {
-                        if (this.selectedMunicipality === item.code) {
+                        if (this.selectedMunicipality == item.code) {
                             this.$emit('input-municipality', i, item);
                         }
                         i = i + 1;

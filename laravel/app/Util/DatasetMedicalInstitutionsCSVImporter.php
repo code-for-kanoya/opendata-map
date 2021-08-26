@@ -18,6 +18,11 @@ use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use App\Models\DataSetMedicalInstitutions;
 
 /**
+ * データセット一覧データDBモデルクラス
+ */
+use App\Models\DataSetList;
+
+/**
  * 更新通知処理用コールバックインターフェース
  */
 use App\Util\ProgressCallbackInterface;
@@ -222,6 +227,9 @@ class DatasetMedicalInstitutionsCSVImporter
                         }
                     }
                     if ($titleCount < 11) {
+                        // データ不備のため、データセットリストデータの更新を行う。
+                        $this->updateDatasetList($code);
+
                         // 必須列タイトルが足りない為、スキップ
                         $message = DatasetCSVTitleName::MEDICAL_INSTITUTIONS." : {$dirName}-> format no match!";
                         \Log::error($message);
@@ -255,7 +263,7 @@ class DatasetMedicalInstitutionsCSVImporter
 
                     // 各列のデータを取得
                     $record->code = Arr::get($line, Arr::get($csvTitleTable, DatasetMedicalInstitutionsCSVTitleNumber::CODE, '')); // 都道府県コード又は市区町村コード
-                    if (empty($record->code)) {
+                    if (empty($record->code) || (strlen($record->code) < 6)) {
                         $record->code = $code; // 都道府県コード又は市区町村コード
                     }
                     $record->no = Arr::get($line, Arr::get($csvTitleTable, DatasetMedicalInstitutionsCSVTitleNumber::NUMBER, '')); // NO
@@ -293,6 +301,11 @@ class DatasetMedicalInstitutionsCSVImporter
                     $record->url = $line[$csvTitleTable[DatasetMedicalInstitutionsCSVTitleNumber::URL]]; // URL
                     $record->note = Arr::get($line, Arr::get($csvTitleTable, DatasetMedicalInstitutionsCSVTitleNumber::NOTE, '')); // 備考
 
+                    if (($record->latitude === 0) || ($record->longitude === 0)) {
+                        // マップにプロットできないため、データセットリストデータの更新を行う。
+                        $this->updateDatasetList($code);
+                    }
+
                     // 更新処理
                     $record->save();
                 } catch (\Exception $e) {
@@ -307,6 +320,9 @@ class DatasetMedicalInstitutionsCSVImporter
 
                         throw new \Exception("UnknownError", 1, $e);
                     }
+
+                    // データ不備のため、データセットリストデータの更新を行う。
+                    $this->updateDatasetList($code);
                 }
             }
 
@@ -319,5 +335,22 @@ class DatasetMedicalInstitutionsCSVImporter
                 $this->callbackInterface->progressUpdate($lineNumber);
             }
         }
+    }
+
+    /**
+     * データセットリストデータの更新を行う。
+     *
+     * @param string $code 団体コード
+     * @Exception 読込失敗時例外発生
+     */
+    private function updateDatasetList($code)
+    {
+        // データセット一覧テーブル更新
+        $list = DataSetList::where('code', $code)->first();
+
+        $list->dataset03 = '不';
+
+        // 更新処理
+        $list->save();
     }
 }

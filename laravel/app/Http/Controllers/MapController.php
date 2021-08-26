@@ -34,10 +34,15 @@ class MapController extends Controller
         $this->prefsdata = json_encode(Prefectures::with('region')->where('region_id', $id)->get(), JSON_UNESCAPED_UNICODE);
     }
 
-    //マップ表示
-    public function index()
+    // マップ表示
+    public function index($id = null, $code = null)
     {
-        return view('map', ['prefsData' => $this->prefsdata]);
+        $params = [
+            'prefsData' => $this->prefsdata,
+            'id' => $id,
+            'code' => $code,
+        ];
+        return view('map', $params);
     }
 
     // 都道府県データ取得
@@ -246,5 +251,176 @@ class MapController extends Controller
     {
         $data = DataSetOpenData::where('code', $this->municipalityCode)->get();
         return $data;
+    }
+
+    // データセット一覧全情報取得
+    public function postRanking(Request $request)
+    {
+        // データセット一覧情報より、全情報を取得する
+        $data = DataSetList::all();
+
+        $scores = $this->calcDatasetListScore($data);
+        $result = $this->sortScore($scores);
+
+        // 取得したデータセット
+        return $result;
+    }
+
+    // データセット一覧情報スコア計算
+    private function calcDatasetListScore($lists)
+    {
+        $i = 0;
+        $scores = [];
+
+        foreach ($lists as $list) {
+            $score = 0;
+
+            // 市区町村名
+            $municipality = Municipalities::where('code', $list->code)->first();
+            $municipalityName = $municipality->name;
+
+            // 都道府県名
+            $prefecture = Prefectures::where('id', $municipality->prefecture_id)->first();
+            $prefectureName = $prefecture->name;
+
+            // スコア計算
+            // サイト有無
+            if ($list->existsite === '〇' || $list->existsite === '○') {
+                $score = $score + 6;
+            }
+            // AED設置箇所一覧
+            if ($list->dataset01 === '〇' || $list->dataset01 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset01 === '異' || $list->dataset01 === '複' || $list->dataset01 === '不') {
+                $score = $score + 3;
+            }
+            // 介護サービス事業所一覧
+            if ($list->dataset02 === '〇' || $list->dataset02 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset02 === '異' || $list->dataset02 === '複' || $list->dataset02 === '不') {
+                $score = $score + 3;
+            }
+            // 医療機関一覧
+            if ($list->dataset03 === '〇' || $list->dataset03 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset03 === '異' || $list->dataset03 === '複' || $list->dataset03 === '不') {
+                $score = $score + 3;
+            }
+            // 文化財一覧
+            if ($list->dataset04 === '〇' || $list->dataset04 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset04 === '異' || $list->dataset04 === '複' || $list->dataset04 === '不') {
+                $score = $score + 3;
+            }
+            // 観光施設一覧
+            if ($list->dataset05 === '〇' || $list->dataset05 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset05 === '異' || $list->dataset05 === '複' || $list->dataset05 === '不') {
+                $score = $score + 3;
+            }
+            // イベント一覧
+            if ($list->dataset06 === '〇' || $list->dataset06 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset06 === '異' || $list->dataset06 === '複' || $list->dataset06 === '不') {
+                $score = $score + 3;
+            }
+            // 公衆無線LANアクセスポイント一覧
+            if ($list->dataset07 === '〇' || $list->dataset07 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset07 === '異' || $list->dataset07 === '複' || $list->dataset07 === '不') {
+                $score = $score + 3;
+            }
+            // 公衆トイレ一覧
+            if ($list->dataset08 === '〇' || $list->dataset08 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset08 === '異' || $list->dataset08 === '複' || $list->dataset08 === '不') {
+                $score = $score + 3;
+            }
+            // 消防水利施設一覧
+            if ($list->dataset09 === '〇' || $list->dataset09 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset09 === '異' || $list->dataset09 === '複' || $list->dataset09 === '不') {
+                $score = $score + 3;
+            }
+            // 指定緊急避難場所一覧
+            if ($list->dataset10 === '〇' || $list->dataset10 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset10 === '異' || $list->dataset10 === '複' || $list->dataset10 === '不') {
+                $score = $score + 3;
+            }
+            // 地域・年齢別人口
+            if ($list->dataset11 === '〇' || $list->dataset11 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset11 === '異' || $list->dataset11 === '複' || $list->dataset11 === '不') {
+                $score = $score + 3;
+            }
+            // 公共施設一覧
+            if ($list->dataset12 === '〇' || $list->dataset12 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset12 === '異' || $list->dataset12 === '複' || $list->dataset12 === '不') {
+                $score = $score + 3;
+            }
+            // 子育て施設一覧
+            if ($list->dataset13 === '〇' || $list->dataset13 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset13 === '異' || $list->dataset13 === '複' || $list->dataset13 === '不') {
+                $score = $score + 3;
+            }
+            // オープンデータ一覧
+            if ($list->dataset14 === '〇' || $list->dataset14 === '○') {
+                $score = $score + 6;
+            } elseif ($list->dataset14 === '異' || $list->dataset14 === '複' || $list->dataset14 === '不') {
+                $score = $score + 3;
+            }
+
+            // ボーナス点加算
+            switch (true) {
+                case $score === 90:
+                    $score = $score + 10;
+                    break;
+                case 50 <= $score:
+                    $score = $score + 5;
+                    break;
+            }
+
+            $scores[$i]['rank'] = 0;
+            $scores[$i]['prefectureCode'] = $prefecture->id;
+            $scores[$i]['prefectureName'] = $prefectureName;
+            $scores[$i]['municipalityCode'] = $municipality->code;
+            $scores[$i]['municipalityName'] = $municipalityName;
+            $scores[$i]['score'] = $score;
+
+            $i += 1;
+        }
+
+        return $scores;
+    }
+
+    // データセット一覧情報スコア並べ替え
+    private function sortScore($scores)
+    {
+        $rank = 1;
+        $count = 1;
+        $beforeScore = -1;
+
+        foreach ($scores as $index => $score) {
+            $sort[$index] = $score['score'];
+        }
+
+        array_multisort($sort, SORT_DESC, $scores);
+
+        foreach ($scores as $index => $score) {
+            if ($beforeScore !== $score['score']) {
+                $rank = $count;
+            }
+
+            $score['rank'] = $rank;
+            $result[$index] = $score;
+
+            $beforeScore = $score['score'];
+            $count += 1;
+        }
+
+        return $result;
     }
 }
