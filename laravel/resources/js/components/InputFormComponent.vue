@@ -13,7 +13,8 @@
                     </option>
                 </select>
             </div>
-            <div id="municipality" class="col-6 col-md-4">
+            <!-- <div id="municipality" class="col-6 col-md-4"> -->
+            <div id="municipality">
                 <select id="select-municipality" class="form-control select-nocode" v-model="selectedMunicipality" v-on:change="selectMunicipality">
                     <option class="select-nocode" value="000000">市区町村</option>
                     <option class="select-code" v-for="municipality in municipalityData" v-bind:key="municipality.code" v-bind:value="municipality.code">
@@ -186,9 +187,36 @@
             // BODIK不参加市区町村除外処理
             removeMunicipality: function() {
                 var self = this;
+                var datasetNgCnt = 0;
 
                 self.datasetListData.forEach(function(dataset) {
-                    if (dataset.url === '') {
+                    datasetNgCnt = 0;
+
+                    for (var item in dataset) {
+                        switch (item) {
+                            case 'dataset01':
+                            case 'dataset02':
+                            case 'dataset03':
+                            case 'dataset04':
+                            case 'dataset05':
+                            case 'dataset06':
+                            case 'dataset07':
+                            case 'dataset08':
+                            case 'dataset09':
+                            case 'dataset10':
+                            case 'dataset11':
+                            case 'dataset12':
+                            case 'dataset13':
+                            case 'dataset14':
+                            case 'existsite':
+                                if (dataset[item] !== '○') {
+                                    datasetNgCnt = datasetNgCnt + 1;
+                                }
+                                break;
+                        }
+                    }
+
+                    if (datasetNgCnt >= 14) {
                         self.municipalityData.some(function(municipality, i) {
                             if (dataset.code == municipality.code) {
                                 self.municipalityData.splice(i, 1);
@@ -262,6 +290,7 @@
     }
     #municipality {
         margin-right: 5px;
+        flex-grow: 1;
     }
     select.select-nocode {
         color: #BFBFBF;
@@ -293,7 +322,7 @@
         margin-left: 38.75px;
     }
 
-    @media screen and (max-width: 576px) {
+    @media screen and (max-width: 767px) and (orientation: portrait) {
         .searchbox {
             width: 100%;
         }

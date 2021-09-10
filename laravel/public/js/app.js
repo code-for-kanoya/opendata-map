@@ -2271,6 +2271,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // ここにjavascriptを記載します
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -2301,14 +2314,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var positionY;
       var top;
       var touched;
-      scoreTop = $('.label-score').position().top;
-      $('.score-help').css('top', scoreTop + 5);
+      var infoTop; // データセット一覧のトップ取得
 
-      if (window.matchMedia('(max-width: 576px)').matches) {
-        var infoTop = $('#info-dataset').position().top;
-        $('#map').css('height', infoTop);
+      infoTop = $('#info-dataset').position().top;
+      setOrientationMapHeight();
+      $(window).on('load orientationchange resize', function () {
+        $('#map').css('height', '100%');
+        setOrientationMapHeight();
+      }); // スコアヘルプボタンの位置セット
+
+      scoreTop = $('.label-score').position().top;
+      $('.score-help').css('top', scoreTop + 5); // 横向き or 縦向きのマップの高さ設定
+
+      function setOrientationMapHeight() {
+        if (Math.abs(window.orientation) === 90) {
+          // 横向き
+          $('#map').css('height', '100%');
+        } else {
+          // 縦向き
+          if (window.matchMedia('(max-width: 767px)').matches) {
+            // スマホ
+            $('#map').css('height', infoTop);
+          } else {
+            // スマホ以外
+            $('#map').css('height', '100%');
+          }
+        }
       }
 
+      ;
       i = 1;
 
       for (i = 1; i < CNT_DATASET; i += 1) {
@@ -2330,6 +2364,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         button.addClass('col-9');
         button.addClass('btn');
         button.addClass('btn-dataset');
+        button.addClass('no-touch');
 
         switch (result) {
           case '〇':
@@ -2344,18 +2379,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       }
 
-      ;
+      ; // データセットボタンクリックイベントを実装
+
       $('.btn-dataset').on('click', function () {
         if ($(this).parent().attr('id').replace('dataset-', '') !== '0') {
-          if (window.matchMedia('(max-width: 576px)').matches) {
-            $('.info-container').css('top', 'calc(100% - 110px)');
-            $('.info-container').css('overflow', 'hidden');
-            $('.info-menu-arrow').removeClass('info-menu-down');
-            $('.info-menu-arrow').addClass('info-menu-up');
-            $('.info-container').scrollTop(0);
+          if (window.matchMedia('(max-width: 1024px)').matches) {
+            setBtnDatasetClick();
           }
         }
-      }); // データセット一覧表示スワイプ処理
+      }); // データセットボタンクリックイベント処理内容
+
+      function setBtnDatasetClick() {
+        $('.info-container').css('top', 'calc(100% - 126px)');
+        $('.info-container').css('overflow', 'hidden');
+        $('.info-menu-arrow').removeClass('info-menu-down');
+        $('.info-menu-arrow').addClass('info-menu-up');
+        $('.info-container').scrollTop(0);
+      }
+
+      ; // データセット一覧表示スワイプイベントを実装
 
       $('.info-menu').on('touchstart', function (e) {
         onTouchStart(e);
@@ -2365,16 +2407,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
       $('.info-menu').on('touchEnd', function (e) {
         onTouchEnd(e);
-      }); // データセット一覧表示矢印タップ処理
+      }); // データセット一覧表示タップ処理
 
-      $('.info-menu-arrow').on('touchstart', function (e) {
-        if ($('.info-menu-arrow').hasClass('info-menu-up')) {
-          swipeUp();
-        } else if ($('.info-menu-arrow').hasClass('info-menu-down')) {
-          swipeDown();
+      $('.info-menu').on('touchstart', function (e) {
+        if (!$(e.target).hasClass('no-touch')) {
+          if ($('.info-menu-arrow').hasClass('info-menu-up')) {
+            swipeUp();
+          } else if ($('.info-menu-arrow').hasClass('info-menu-down')) {
+            swipeDown();
+          }
+        } else {
+          if (e.target.disabled) {
+            if ($('.info-menu-arrow').hasClass('info-menu-up')) {
+              swipeUp();
+            } else if ($('.info-menu-arrow').hasClass('info-menu-down')) {
+              swipeDown();
+            }
+          }
         }
-
-        return false;
       });
 
       function getPosition(event) {
@@ -2406,23 +2456,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       }
 
-      ;
+      ; // 上にスワイプ
 
       function swipeUp() {
+        var top = scoreTop + 18;
         $('.info-container').css('top', 0);
         $('.info-container').css('overflow', 'auto');
         $('.info-menu-arrow').removeClass('info-menu-up');
         $('.info-menu-arrow').addClass('info-menu-down');
+        $('.label-score').css('margin-top', 15);
+        $('.score-help').css('top', top);
       }
 
-      ;
+      ; // 下にスワイプ
 
       function swipeDown() {
+        var top = scoreTop + 5;
         $('.info-container').css('top', 'calc(100% - 110px)');
         $('.info-container').css('overflow', 'hidden');
         $('.info-container').scrollTop(0);
         $('.info-menu-arrow').removeClass('info-menu-down');
         $('.info-menu-arrow').addClass('info-menu-up');
+        $('.label-score').css('margin-top', 0);
+        $('.score-help').css('top', top);
       }
 
       ;
@@ -2702,6 +2758,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 // ここにjavascriptを記載します
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -2922,8 +2979,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     // BODIK不参加市区町村除外処理
     removeMunicipality: function removeMunicipality() {
       var self = this;
+      var datasetNgCnt = 0;
       self.datasetListData.forEach(function (dataset) {
-        if (dataset.url === '') {
+        datasetNgCnt = 0;
+
+        for (var item in dataset) {
+          switch (item) {
+            case 'dataset01':
+            case 'dataset02':
+            case 'dataset03':
+            case 'dataset04':
+            case 'dataset05':
+            case 'dataset06':
+            case 'dataset07':
+            case 'dataset08':
+            case 'dataset09':
+            case 'dataset10':
+            case 'dataset11':
+            case 'dataset12':
+            case 'dataset13':
+            case 'dataset14':
+            case 'existsite':
+              if (dataset[item] !== '○') {
+                datasetNgCnt = datasetNgCnt + 1;
+              }
+
+              break;
+          }
+        }
+
+        if (datasetNgCnt >= 14) {
           self.municipalityData.some(function (municipality, i) {
             if (dataset.code == municipality.code) {
               self.municipalityData.splice(i, 1);
@@ -3261,7 +3346,7 @@ var INIT_ZOOMLEVEL = 7;
         var helpContent = '';
         helpContent += '<div class="title-legend">凡例</div>';
         helpContent += '<div class="legend">';
-        helpContent += '<i style="background: ' + getColor(0) + ';"></i>' + ' 不参加団体<br>';
+        helpContent += '<i style="background: ' + getColor(0) + ';"></i>' + ' データセット選択不可<br>';
         helpContent += '<i style="background: ' + getColor(1) + ';"></i>' + ' 1点 &ndash; 19点<br>';
         helpContent += '<i style="background: ' + getColor(20) + ';"></i> ' + '20点 &ndash; 39点<br>';
         helpContent += '<i style="background: ' + getColor(40) + ';"></i> ' + '40点 &ndash; 59点<br>';
@@ -3303,8 +3388,7 @@ var INIT_ZOOMLEVEL = 7;
     initMunicipality: function initMunicipality(prefectureData, datasetlistData) {
       var self = this;
       var prefectureId = 0;
-      var prefGeoJson = '';
-      this.dispLoading(''); // 自治体境をクリアする
+      var prefGeoJson = ''; // 自治体境をクリアする
 
       this.clearMunicipalityCoordinates();
 
@@ -3361,6 +3445,7 @@ var INIT_ZOOMLEVEL = 7;
         return;
       }
 
+      this.dispLoading('');
       axios__WEBPACK_IMPORTED_MODULE_9___default.a.get('/assets/json/' + prefGeoJson).then(function (json) {
         addDataToMap(this.myMap, json.data);
       }.bind(this))["finally"](function () {
@@ -3392,13 +3477,15 @@ var INIT_ZOOMLEVEL = 7;
 
       function scoring(code) {
         // 変数
-        var score = 0; // 戻り値
+        var score = 0;
+        var datasetNgCnt = 0; // 戻り値
 
         var color = '';
         var data = datasetlistData.find(function (item) {
           return item.code.substring(0, 5) === code;
         });
         score = 0;
+        datasetNgCnt = 0;
 
         for (var item in data) {
           if (data[item] === '〇' || data[item] === '○') {
@@ -3433,6 +3520,9 @@ var INIT_ZOOMLEVEL = 7;
                 score = score + 6;
               } else if (data[item] === '異' || data[item] === '複' || data[item] === '不') {
                 score = score + 3;
+                datasetNgCnt = datasetNgCnt + 1;
+              } else {
+                datasetNgCnt = datasetNgCnt + 1;
               }
 
               break;
@@ -3476,6 +3566,10 @@ var INIT_ZOOMLEVEL = 7;
 
           default:
             color = 'black';
+        }
+
+        if (datasetNgCnt === 14) {
+          color = 'black';
         }
 
         return color;
@@ -10094,7 +10188,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* ここにcssを記載します */\n/* 一覧情報 */\n.info-container {\n    top: 80;\n    width: 345px;\n    transition: transform 0.3s;\n    background-color: white;\n    overflow: auto;\n}\n.info-menu {\n    position: relative;\n    -webkit-text-size-adjust: 100%;\n}\n.info-menu-top {\n    background-color: white;\n    border-radius: 10px 10px 0px 0px;\n    border-top: 8px solid white;\n    margin: 0 auto 15 auto;\n}\n.info-menu-up {\n    display: none;\n    width: 1rem;\n    height: 1rem;\n    border-top: solid #dadce0;\n    border-right: solid #dadce0;\n    transform: rotate(-45deg);\n    margin-left: 50%;\n}\n.info-menu-down {\n    display: none;\n    width: 1rem;\n    height: 1rem;\n    border-top: solid #dadce0;\n    border-left: solid #dadce0;\n    transform: rotate(-135deg);\n    margin-left: 50%;\n}\n.info-action-label {\n    display: block;\n    line-height: 24px;\n    padding-left: 12px 0;\n    text-transform: none;\n}\n.label-name {\n    padding-left: 15px;\n    color: black;\n    text-align: left;\n    font-size: 27px;\n    font-weight: 500;\n}\n.label-score {\n    color: red;\n    text-align: center;\n    font-size: 40px;\n    font-weight: 500;\n    font-style: italic;\n}\n.label-time {\n    display: block;\n    margin-top: 1rem;\n    margin-right: 0.75rem;\n    color: black;\n    text-align: right;\n}\n.label-select-item {\n    margin-right: 0.75rem;\n    color: black;\n    text-align: right;\n}\n.score-help {\n    position: absolute;\n    right: 11px;\n}\n.result {\n    display: inline-block;\n}\n.btn-dataset {\n    margin: 0.375rem 0.75rem;\n    padding: 0rem 0rem;\n}\n.link-dataset {\n    display: inline-block;\n    margin: 0.375rem 0.75rem;\n    padding: 0rem 0rem;\n}\n.icon-rank {\n    display: block;\n    position: absolute;\n    margin: 4px 0 0 45px;\n}\n.rank {\n    position: absolute;\n    margin: 0 0 0 70px;\n}\n@media screen and (max-width: 576px) {\n.info-container {\n        width: 100%;\n        margin-top: 0;\n        top: calc(100% - 110px);\n        transition: all .5s;\n}\n.info-menu-up {\n        display: block;\n        z-index: 3500;\n}\n.info-menu-down {\n        display: block;\n        z-index: 3500;\n}\n}\n\n/* モーダル */\n.modal-area,\n.modal-area-rank {\n    display: none;\n    position: fixed;\n    z-index: 4000;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n}\n.modal-bg {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(30,30,30,0.7);\n}\n.modal-wrapper {\n    position: relative;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%,-50%);\n    width: 95%;\n    max-width: 900px;\n    padding: 10px 30px;\n    background-color: #fff;\n    height: 70%;\n    overflow: auto;\n}\n.close-modal {\n    position: fixed;\n    top: 0.5rem;\n    right: 0.5rem;\n    cursor: pointer;\n}\n.modal-content-head {\n    margin-bottom: 1.1rem;\n}\n.modal-content-title {\n    margin-top: 1rem;\n}\nli {\n    font-size: 0.81rem;\n}\n.ex-score {\n    display: block;\n    margin: 0.5rem;\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 0.3rem;\n    padding: 0rem 0.5rem;\n}\n.table {\n    margin-top: 2rem;\n    border-top: 1px solid #cccccc;\n    border-left: 1px solid #cccccc;\n}\n.table .tr {\n    display: table;\n    width: 100%;\n}\n.table .tr .th,\n.table .tr .td {\n    display: table-cell;\n    width: 25%;\n    padding: 8px 15px;\n    border-right: 1px solid #cccccc;\n    border-bottom: 1px solid #cccccc;\n}\n.table .tr .th {\n    background-color: #f5f5f5;\n}\n.table .tr .td {\n    background-color: #f5f5f5;\n}\n.td-number {\n    text-align: right;\n}\n@media screen and (max-width: 576px) {\n.table .tr .th,\n    .table .tr .td {\n        font-size: 0.65rem;\n}\n}\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* ここにcssを記載します */\n/* 一覧情報 */\n.info-container {\n    top: 80;\n    width: 345px;\n    transition: transform 0.3s;\n    background-color: white;\n}\n.info-menu {\n    position: relative;\n    -webkit-text-size-adjust: 100%;\n}\n.info-menu-top {\n    background-color: white;\n    border-radius: 10px 10px 0px 0px;\n    border-top: 8px solid white;\n    margin: 0 auto;\n}\n.info-menu-up {\n    display: none;\n    width: 1rem;\n    height: 1rem;\n    border-top: solid #dadce0;\n    border-right: solid #dadce0;\n    transform: rotate(-45deg);\n    margin-left: 50%;\n}\n.info-menu-down {\n    display: none;\n    width: 1rem;\n    height: 1rem;\n    border-top: solid #dadce0;\n    border-left: solid #dadce0;\n    transform: rotate(-135deg);\n    margin-left: 50%;\n}\n.info-action-label {\n    display: block;\n    line-height: 24px;\n    padding-left: 12px 0;\n    text-transform: none;\n}\n.label-name {\n    padding-left: 15px;\n    color: black;\n    text-align: left;\n    font-size: 27px;\n    font-weight: 500;\n}\n.label-score {\n    color: red;\n    text-align: center;\n    font-size: 32px;\n    font-weight: 500;\n    font-style: italic;\n}\n.label-time {\n    display: block;\n    margin-top: 1rem;\n    margin-right: 0.75rem;\n    color: black;\n    text-align: right;\n}\n.label-select-item {\n    margin-right: 0.75rem;\n    color: black;\n    text-align: right;\n}\n.score-help {\n    position: absolute;\n    right: 11px;\n}\n.result {\n    display: inline-block;\n}\n.btn-dataset {\n    margin: 0.375rem 0.75rem;\n    padding: 0rem 0rem;\n}\n.link-dataset {\n    display: inline-block;\n    margin: 0.375rem 0.75rem;\n    padding: 0.375rem 0.75rem;\n}\n.icon-rank {\n    display: block;\n    position: absolute;\n    margin: 4px 0 0 45px;\n}\n.rank {\n    position: absolute;\n    margin: 0 0 0 70px;\n}\n.icon-plot {\n    margin: 0 0 0 -7;\n    color: forestgreen;\n    font-size: 22px;\n}\n@media screen and (max-width: 767px) and (orientation: portrait) {\n.info-container {\n        width: 100%;\n        margin-top: 0;\n        top: calc(100% - 110px);\n        transition: all .5s;\n}\n.info-menu-up {\n        display: block;\n        z-index: 3500;\n}\n.info-menu-down {\n        display: block;\n        z-index: 3500;\n}\n}\n@media screen and (max-width: 1024px) {\n.info-container {\n        margin-top: 0;\n        top: calc(100% - 110px);\n        transition: all .5s;\n}\n.info-menu-up {\n        display: block;\n        z-index: 3500;\n}\n.info-menu-down {\n        display: block;\n        z-index: 3500;\n}\n}\n\n/* モーダル */\n.modal-area,\n.modal-area-rank {\n    display: none;\n    position: fixed;\n    z-index: 4000;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n}\n.modal-bg {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(30,30,30,0.7);\n}\n.modal-wrapper {\n    position: relative;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%,-50%);\n    width: 95%;\n    max-width: 950px;\n    padding: 10px 30px;\n    background-color: #fff;\n    height: 70%;\n    overflow: auto;\n}\n.close-modal {\n    position: fixed;\n    top: 0.5rem;\n    right: 0.5rem;\n    cursor: pointer;\n}\n.modal-content-head {\n    margin-bottom: 1.1rem;\n}\n.modal-content-title {\n    margin-top: 1rem;\n}\nli {\n    font-size: 0.81rem;\n}\n.ex-score {\n    display: block;\n    margin: 0.5rem;\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 0.3rem;\n    padding: 0rem 0.5rem;\n}\n.table {\n    margin-top: 2rem;\n    border-top: 1px solid #cccccc;\n    border-left: 1px solid #cccccc;\n}\n.table .tr {\n    display: table;\n    width: 100%;\n}\n.table .tr .th,\n.table .tr .td {\n    display: table-cell;\n    width: 25%;\n    padding: 8px 15px;\n    border-right: 1px solid #cccccc;\n    border-bottom: 1px solid #cccccc;\n}\n.table .tr .th {\n    background-color: #f5f5f5;\n}\n.table .tr .td {\n    background-color: #f5f5f5;\n}\n.td-number {\n    text-align: right;\n}\n@media screen and (max-width: 767px) {\n.table .tr .th,\n    .table .tr .td {\n        font-size: 0.65rem;\n}\n}\n", ""]);
 
 // exports
 
@@ -10113,7 +10207,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* ここにcssを記載します */\n.searchbox {\n    background-color: white;\n    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);\n    position: relative;\n}\n.form-inline {\n    margin-bottom: 0;\n}\n.searchbox-icon {\n    margin: 5px;\n    padding: 5px 0px 5px 0px;\n}\n#prefecture,\n#municipality {\n    padding-right: 0px;\n    padding-left: 0px;\n}\n#municipality {\n    margin-right: 5px;\n}\nselect.select-nocode {\n    color: #BFBFBF;\n}\nselect.select-nocode:focus {\n    color: #BFBFBF;\n}\nselect.select-code {\n    color: #212121;\n}\nselect.select-code:focus {\n    color: #212121;\n}\n.select-code {\n    color: #212121;\n}\n.select-code:focus {\n    color: #212121;\n}\n.select-nocode {\n    color: #BFBFBF;\n}\n.select-nocode:focus {\n    color: #BFBFBF;\n}\n.select-dataset {\n    margin-bottom: 5px;\n    margin-left: 38.75px;\n}\n@media screen and (max-width: 576px) {\n.searchbox {\n        width: 100%;\n}\n}\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* ここにcssを記載します */\n.searchbox {\n    background-color: white;\n    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);\n    position: relative;\n}\n.form-inline {\n    margin-bottom: 0;\n}\n.searchbox-icon {\n    margin: 5px;\n    padding: 5px 0px 5px 0px;\n}\n#prefecture,\n#municipality {\n    padding-right: 0px;\n    padding-left: 0px;\n}\n#municipality {\n    margin-right: 5px;\n    flex-grow: 1;\n}\nselect.select-nocode {\n    color: #BFBFBF;\n}\nselect.select-nocode:focus {\n    color: #BFBFBF;\n}\nselect.select-code {\n    color: #212121;\n}\nselect.select-code:focus {\n    color: #212121;\n}\n.select-code {\n    color: #212121;\n}\n.select-code:focus {\n    color: #212121;\n}\n.select-nocode {\n    color: #BFBFBF;\n}\n.select-nocode:focus {\n    color: #BFBFBF;\n}\n.select-dataset {\n    margin-bottom: 5px;\n    margin-left: 38.75px;\n}\n@media screen and (max-width: 767px) and (orientation: portrait) {\n.searchbox {\n        width: 100%;\n}\n}\n", ""]);
 
 // exports
 
@@ -10132,7 +10226,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    /* ここにcssを記載します */\n\n    /* マップ */\nhtml, body, #map {\n      width:  100%;\n      height: 100%;\n}\n\n    /* 検索入力 */\n#input-id {\n      position: absolute;\n      z-index: 2000;\n}\n@media screen and (min-width: 576px) {\n#input-id {\n            top: 3px;\n            left: 3px;\n}\n}\n\n    /* データセット一覧 */\n#info-dataset {\n        position: fixed;\n        bottom: 0;\n        z-index: 3000;\n}\n\n    /* データセットプロットデータ */\n.dataset-plot-content {\n        overflow-wrap: break-word;\n        word-wrap: break-word;\n}\n.marker-plot {\n        position: absolute;\n        left: -5px;\n        bottom: 0px;\n        font-size: 20px;\n        color: white;\n}\n.marker-plot i {\n        background-color: forestgreen;\n        border-radius: 50%;\n        text-align: center;\n        width: 30px;\n        height: 30px;\n}\n.marker-plot i::before {\n        padding: 0;\n        line-height: 30px;\n}\n\n    /* ヘルプ */\n.leaflet-control-window {\n        width: 10%;\n}\n\n    /* 凡例 */\n.legend {\n        margin-bottom: 10px;\n        padding: 6px 8px;\n        font: 14px/16px Arial, Helvetica, sans-serif;\n        background: white;\n        background: rgba(255,255,255,0.8);\n        box-shadow: 0 0 15px rgba(0,0,0,0.2);\n        border-radius: 5px;\n        line-height: 17px;\n        color: #555;\n        width: 130px;\n}\n.legend i {\n        width: 17px;\n        height: 17px;\n        float: left;\n        margin-right: 8px;\n}\n.leaflet-control-window a:hover {\n        color: #ff7043;\n}\n.leaflet-control-window .about {\n        margin-bottom: 10px;\n}\n.leaflet-control-window .ver-title {\n        margin-bottom: 0;\n}\n.leaflet-control-window .ver-info-detail {\n        margin-bottom: 0;\n        padding-left: 10px;\n}\n#ver-info-link {\n        padding-left: 10px;\n}\n.leaflet-control-window .ver-info .copyright {\n        text-align: left;\n}\n@media screen and (max-width: 576px) {\n.leaflet-control-window {\n            width: 50%;\n}\n}\n\n    /* Now Loading */\n#loading {\n        display: table;\n        position: fixed;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 20000;\n        color: #fff;\n        background-color: black;\n        opacity: 0.6;\n}\n.loader {\n        display: table-cell;\n        text-align: center;\n        vertical-align: middle;\n        top: 50%;\n        -webkit-animation: spin 1s ease-in infinite;\n                animation: spin 1s ease-in infinite;\n}\n@-webkit-keyframes spin {\n0% {\n            transform: rotate(0deg);\n}\n100% {\n            transform: rotate(360deg);\n}\n}\n@keyframes spin {\n0% {\n            transform: rotate(0deg);\n}\n100% {\n            transform: rotate(360deg);\n}\n}\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n    /* ここにcssを記載します */\n\n    /* マップ */\nhtml, body, #map {\n      width:  100%;\n      height: 100%;\n      -webkit-text-size-adjust: 100%;\n}\n\n    /* 検索入力 */\n#input-id {\n      position: absolute;\n      z-index: 2000;\n}\n@media screen and (min-width: 767px) and (orientation: portrait) {\n#input-id {\n            top: 3px;\n            left: 3px;\n}\n}\n\n    /* データセット一覧 */\n#info-dataset {\n        position: fixed;\n        bottom: 0;\n        z-index: 3000;\n}\n\n    /* データセットプロットデータ */\n.dataset-plot-content {\n        overflow-wrap: break-word;\n        word-wrap: break-word;\n}\n.marker-plot {\n        position: absolute;\n        left: -5px;\n        bottom: 0px;\n        font-size: 20px;\n        color: white;\n}\n.marker-plot i {\n        background-color: forestgreen;\n        border-radius: 50%;\n        text-align: center;\n        width: 30px;\n        height: 30px;\n}\n.marker-plot i::before {\n        padding: 0;\n        line-height: 30px;\n}\n\n    /* ヘルプ */\n.leaflet-control-window {\n        width: 10%;\n}\n\n    /* 凡例 */\n.legend {\n        margin-bottom: 10px;\n        padding: 6px 8px;\n        font: 14px/16px Arial, Helvetica, sans-serif;\n        background: white;\n        background: rgba(255,255,255,0.8);\n        box-shadow: 0 0 15px rgba(0,0,0,0.2);\n        border-radius: 5px;\n        line-height: 17px;\n        color: #555;\n        width: 130px;\n}\n.legend i {\n        width: 17px;\n        height: 17px;\n        float: left;\n        margin-right: 8px;\n}\n.leaflet-control-window a:hover {\n        color: #ff7043;\n}\n.leaflet-control-window .about {\n        margin-bottom: 10px;\n}\n.leaflet-control-window .ver-title {\n        margin-bottom: 0;\n}\n.leaflet-control-window .ver-info-detail {\n        margin-bottom: 0;\n        padding-left: 10px;\n}\n#ver-info-link {\n        padding-left: 10px;\n}\n.leaflet-control-window .ver-info .copyright {\n        text-align: left;\n}\n@media screen and (max-width: 767px) and (orientation: portrait) {\n.leaflet-control-window {\n            width: 50%;\n}\n}\n\n    /* Now Loading */\n#loading {\n        display: table;\n        position: fixed;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 20000;\n        color: #fff;\n        background-color: black;\n        opacity: 0.6;\n}\n.loader {\n        display: table-cell;\n        text-align: center;\n        vertical-align: middle;\n        top: 50%;\n        -webkit-animation: spin 1s ease-in infinite;\n                animation: spin 1s ease-in infinite;\n}\n@-webkit-keyframes spin {\n0% {\n            transform: rotate(0deg);\n}\n100% {\n            transform: rotate(360deg);\n}\n}\n@keyframes spin {\n0% {\n            transform: rotate(0deg);\n}\n100% {\n            transform: rotate(360deg);\n}\n}\n", ""]);
 
 // exports
 
@@ -58375,17 +58469,24 @@ var render = function() {
         _vm._v(" "),
         _vm._m(1),
         _vm._v(" "),
-        _c("div", { staticClass: "info-action-label" }, [
-          _vm._m(2),
-          _vm._v(" "),
-          _c("div", { staticClass: "rank" }, [
-            _vm._v(_vm._s(_vm.ranking) + " / 233位")
-          ]),
-          _vm._v(" "),
-          _c("label", { staticClass: "label-time" }, [
-            _vm._v("2021年04月27日　時点")
-          ])
-        ]),
+        _c(
+          "div",
+          {
+            staticClass: "info-action-label",
+            staticStyle: { margin: "-10 0 -5 0" }
+          },
+          [
+            _vm._m(2),
+            _vm._v(" "),
+            _c("div", { staticClass: "rank" }, [
+              _vm._v(_vm._s(_vm.ranking) + " / 233位")
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "label-time" }, [
+              _vm._v("2021年04月27日　時点")
+            ])
+          ]
+        ),
         _vm._v(" "),
         _c("div", { staticClass: "dataset row-cols-1 form-inline" }, [
           _c("div", { attrs: { id: "dataset-1" } }, [
@@ -58405,7 +58506,9 @@ var render = function() {
                 }
               },
               [_vm._v("AED設置箇所一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(3)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-2" } }, [
@@ -58425,7 +58528,9 @@ var render = function() {
                 }
               },
               [_vm._v("介護サービス事業所一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(4)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-3" } }, [
@@ -58445,7 +58550,9 @@ var render = function() {
                 }
               },
               [_vm._v("医療機関一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(5)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-4" } }, [
@@ -58465,7 +58572,9 @@ var render = function() {
                 }
               },
               [_vm._v("文化財一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(6)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-5" } }, [
@@ -58485,7 +58594,9 @@ var render = function() {
                 }
               },
               [_vm._v("観光施設一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(7)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-6" } }, [
@@ -58505,7 +58616,9 @@ var render = function() {
                 }
               },
               [_vm._v("イベント一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(8)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-7" } }, [
@@ -58525,7 +58638,9 @@ var render = function() {
                 }
               },
               [_vm._v("公衆無線LANアクセスポイント一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(9)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-8" } }, [
@@ -58545,7 +58660,9 @@ var render = function() {
                 }
               },
               [_vm._v("公衆トイレ一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(10)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-9" } }, [
@@ -58565,7 +58682,9 @@ var render = function() {
                 }
               },
               [_vm._v("消防水利施設一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(11)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-10" } }, [
@@ -58585,7 +58704,9 @@ var render = function() {
                 }
               },
               [_vm._v("指定緊急避難場所一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(12)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-11" } }, [
@@ -58625,7 +58746,9 @@ var render = function() {
                 }
               },
               [_vm._v("公共施設一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(13)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-13" } }, [
@@ -58645,7 +58768,9 @@ var render = function() {
                 }
               },
               [_vm._v("子育て施設一覧")]
-            )
+            ),
+            _vm._v(" "),
+            _vm._m(14)
           ]),
           _vm._v(" "),
           _c("div", { attrs: { id: "dataset-14" } }, [
@@ -58678,6 +58803,7 @@ var render = function() {
                   _c(
                     "a",
                     {
+                      staticClass: "no-touch",
                       attrs: {
                         href: _vm.infoData.url,
                         target: "_blank",
@@ -58703,7 +58829,7 @@ var render = function() {
           _c("div", { staticClass: "modal-bg" }),
           _vm._v(" "),
           _c("div", { staticClass: "modal-wrapper" }, [
-            _vm._m(3),
+            _vm._m(15),
             _vm._v(" "),
             _c("div", { staticClass: "modal-contents" }, [
               _c("div", { staticClass: "modal-content-head" }),
@@ -58712,7 +58838,7 @@ var render = function() {
                 "div",
                 { staticClass: "table" },
                 [
-                  _vm._m(4),
+                  _vm._m(16),
                   _vm._v(" "),
                   _vm._l(_vm.datasetData, function(data) {
                     return _c("div", { key: data.id, staticClass: "tr" }, [
@@ -58748,7 +58874,7 @@ var render = function() {
           _c("div", { staticClass: "modal-bg" }),
           _vm._v(" "),
           _c("div", { staticClass: "modal-wrapper" }, [
-            _vm._m(5),
+            _vm._m(17),
             _vm._v(" "),
             _c("div", { staticClass: "modal-contents" }, [
               _c("div", { staticClass: "modal-content-head" }),
@@ -58757,7 +58883,7 @@ var render = function() {
                 "div",
                 { staticClass: "table" },
                 [
-                  _vm._m(6),
+                  _vm._m(18),
                   _vm._v(" "),
                   _vm._l(_vm.datasetData, function(data) {
                     return _c("div", { key: data.id, staticClass: "tr" }, [
@@ -58786,7 +58912,7 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _vm._m(7)
+      _vm._m(19)
     ]
   )
 }
@@ -58806,7 +58932,7 @@ var staticRenderFns = [
     return _c(
       "button",
       { staticClass: "score-help", attrs: { type: "button" } },
-      [_c("i", { staticClass: "fas fa-question" })]
+      [_c("i", { staticClass: "fas fa-question no-touch" })]
     )
   },
   function() {
@@ -58815,6 +58941,102 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("span", { staticClass: "icon-rank" }, [
       _c("i", { staticClass: "fas fa-crown" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-heartbeat" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-wheelchair" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-clinic-medical" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-torii-gate" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-landmark" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-users" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-wifi" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-restroom" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-fire-extinguisher" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-running" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-building" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "icon-plot" }, [
+      _c("i", { staticClass: "fas fa-baby" })
     ])
   },
   function() {
@@ -58879,51 +59101,105 @@ var staticRenderFns = [
           _c("div", { staticClass: "modal-contents" }, [
             _c("div", { staticClass: "modal-content-head" }),
             _vm._v(" "),
-            _c("div", { staticClass: "modal-content-title" }, [
-              _vm._v("【データセット判定】")
+            _c("h4", { staticClass: "modal-content-title" }, [
+              _vm._v("【データセットの配点と判定】")
             ]),
             _vm._v(" "),
-            _c("ul", [
-              _c("li", [
-                _vm._v(
-                  "「〇」オープンデータカタログサイトにて、データセットが取得できる"
-                )
-              ]),
-              _vm._v(" "),
-              _c("li", [
-                _vm._v(
-                  "「不」オープンデータカタログサイトにて、データセットが取得できるが、必須項目または緯度・経度のデータが存在しない"
-                )
-              ]),
-              _vm._v(" "),
-              _c("li", [
-                _vm._v(
-                  "「異」オープンデータカタログサイトにて、データセット名での検索結果1件以上、データセット名を含む名称が存在しない"
-                )
-              ]),
-              _vm._v(" "),
-              _c("li", [
-                _vm._v(
-                  "「失」オープンデータカタログサイトにて、データセットのダウンロードに失敗する"
-                )
-              ]),
-              _vm._v(" "),
-              _c("li", [
-                _vm._v(
-                  "「✕」オープンデータカタログサイトにて、データセット名での検索結果0件"
-                )
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "modal-content-title" }, [
-              _vm._v("【オープンデータカタログサイト判定】")
-            ]),
-            _vm._v(" "),
-            _c("ul", [
-              _c("li", [
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("〇：6pt")]),
+                _vm._v(" "),
                 _c("div", [
                   _vm._v(
-                    "「〇」https://odcs.bodik.jp/+全国地方公共団体コード　で、各自治体のオープンデータカタログサイトに遷移できる"
+                    "オープンデータカタログサイトにて、データセットが取得できる"
+                  )
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("不：3pt")]),
+                _vm._v(" "),
+                _c("div", [
+                  _vm._v(
+                    "オープンデータカタログサイトにて、データセットが取得できるが、必須項目または緯度・経度のデータが存在しない"
+                  )
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("異：3pt")]),
+                _vm._v(" "),
+                _c("div", [
+                  _vm._v(
+                    "オープンデータカタログサイトにて、データセット名での検索結果1件以上、データセット名を含む名称が存在しない"
+                  )
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("失：0pt")]),
+                _vm._v(" "),
+                _c("div", [
+                  _vm._v(
+                    "オープンデータカタログサイトにて、データセットのダウンロードに失敗する"
+                  )
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("✕：0pt")]),
+                _vm._v(" "),
+                _c("div", [
+                  _vm._v(
+                    "オープンデータカタログサイトにて、データセット名での検索結果0件"
+                  )
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c("h4", { staticClass: "modal-content-title" }, [
+              _vm._v("【オープンデータカタログサイトの判定と配点】")
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("〇：6pt")]),
+                _vm._v(" "),
+                _c("div", [
+                  _vm._v(
+                    "https://odcs.bodik.jp/+全国地方公共団体コード　で、各自治体のオープンデータカタログサイトに遷移できる"
                   )
                 ]),
                 _vm._v(" "),
@@ -58932,48 +59208,38 @@ var staticRenderFns = [
                     "※オープンデータカタログサイトのURLの全国地方公共団体コードが古い場合、遷移できない"
                   )
                 ])
-              ]),
-              _vm._v(" "),
-              _c("li", [
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticStyle: { "margin-bottom": "1rem", "margin-left": "1rem" }
+              },
+              [
+                _c("div", [_vm._v("✕：0pt")]),
+                _vm._v(" "),
                 _c("div", [
                   _vm._v(
-                    "「✕」https://odcs.bodik.jp/+全国地方公共団体コード　で、各自治体のオープンデータカタログサイトに遷移できない"
+                    "https://odcs.bodik.jp/+全国地方公共団体コード　で、各自治体のオープンデータカタログサイトに遷移できない"
                   )
                 ])
-              ])
-            ]),
+              ]
+            ),
             _vm._v(" "),
-            _c("div", { staticClass: "modal-content-title" }, [
-              _vm._v("【データセットの配点】")
-            ]),
-            _vm._v(" "),
-            _c("ul", [
-              _c("li", [_vm._v("オープンデータカタログサイト「〇」：6pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("オープンデータカタログサイト「✕」：0pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("各データセット「〇」：6pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("各データセット「不」：3pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("各データセット「異」：3pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("各データセット「失」：0pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("各データセット「✕」：0pt")])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "modal-content-title" }, [
+            _c("h4", { staticClass: "modal-content-title" }, [
               _vm._v("【ボーナス点】")
             ]),
             _vm._v(" "),
-            _c("ul", [
-              _c("li", [_vm._v("合計点が90pt：+10pt")]),
-              _vm._v(" "),
-              _c("li", [_vm._v("合計点が50pt以上90pt未満：+5pt")])
+            _c("div", { staticStyle: { "margin-left": "1rem" } }, [
+              _vm._v("合計点が90pt：+10pt")
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "modal-content-title" }, [
+            _c("div", { staticStyle: { "margin-left": "1rem" } }, [
+              _vm._v("合計点が50pt以上90pt未満：+5pt")
+            ]),
+            _vm._v(" "),
+            _c("h4", { staticClass: "modal-content-title" }, [
               _vm._v("（計算例）")
             ]),
             _vm._v(" "),
@@ -59123,71 +59389,67 @@ var render = function() {
         )
       ]),
       _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "col-6 col-md-4", attrs: { id: "municipality" } },
-        [
-          _c(
-            "select",
-            {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.selectedMunicipality,
-                  expression: "selectedMunicipality"
-                }
-              ],
-              staticClass: "form-control select-nocode",
-              attrs: { id: "select-municipality" },
-              on: {
-                change: [
-                  function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.selectedMunicipality = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  },
-                  _vm.selectMunicipality
-                ]
+      _c("div", { attrs: { id: "municipality" } }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.selectedMunicipality,
+                expression: "selectedMunicipality"
               }
-            },
-            [
-              _c(
-                "option",
-                { staticClass: "select-nocode", attrs: { value: "000000" } },
-                [_vm._v("市区町村")]
-              ),
-              _vm._v(" "),
-              _vm._l(_vm.municipalityData, function(municipality) {
-                return _c(
-                  "option",
-                  {
-                    key: municipality.code,
-                    staticClass: "select-code",
-                    domProps: { value: municipality.code }
-                  },
-                  [
-                    _vm._v(
-                      "\n                    " +
-                        _vm._s(municipality.name) +
-                        "\n                "
-                    )
-                  ]
-                )
-              })
             ],
-            2
-          )
-        ]
-      )
+            staticClass: "form-control select-nocode",
+            attrs: { id: "select-municipality" },
+            on: {
+              change: [
+                function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.selectedMunicipality = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                },
+                _vm.selectMunicipality
+              ]
+            }
+          },
+          [
+            _c(
+              "option",
+              { staticClass: "select-nocode", attrs: { value: "000000" } },
+              [_vm._v("市区町村")]
+            ),
+            _vm._v(" "),
+            _vm._l(_vm.municipalityData, function(municipality) {
+              return _c(
+                "option",
+                {
+                  key: municipality.code,
+                  staticClass: "select-code",
+                  domProps: { value: municipality.code }
+                },
+                [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(municipality.name) +
+                      "\n                "
+                  )
+                ]
+              )
+            })
+          ],
+          2
+        )
+      ])
     ]),
     _vm._v(" "),
     _c("div", { attrs: { id: "dataset" } }, [

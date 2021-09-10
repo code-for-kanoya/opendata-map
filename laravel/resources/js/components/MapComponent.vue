@@ -228,7 +228,7 @@
                     var helpContent = '';
                     helpContent += '<div class="title-legend">凡例</div>';
                     helpContent += '<div class="legend">';
-                    helpContent += '<i style="background: ' + getColor(0) + ';"></i>' + ' 不参加団体<br>';
+                    helpContent += '<i style="background: ' + getColor(0) + ';"></i>' + ' データセット選択不可<br>';
                     helpContent += '<i style="background: ' + getColor(1) + ';"></i>' + ' 1点 &ndash; 19点<br>';
                     helpContent += '<i style="background: ' + getColor(20) + ';"></i> ' + '20点 &ndash; 39点<br>';
                     helpContent += '<i style="background: ' + getColor(40) + ';"></i> ' + '40点 &ndash; 59点<br>';
@@ -273,8 +273,6 @@
                 var self = this;
                 var prefectureId = 0;
                 var prefGeoJson = '';
-
-                this.dispLoading('');
 
                 // 自治体境をクリアする
                 this.clearMunicipalityCoordinates();
@@ -325,6 +323,8 @@
                     return;
                 }
 
+                this.dispLoading('');
+
                 axios
                     .get('/assets/json/' + prefGeoJson)
                     .then(function (json) {
@@ -362,6 +362,7 @@
                 function scoring(code) {
                     // 変数
                     var score = 0;
+                    var datasetNgCnt = 0;
                     // 戻り値
                     var color = '';
 
@@ -370,6 +371,7 @@
                     });
 
                     score = 0;
+                    datasetNgCnt = 0;
 
                     for (var item in data) {
                         if (data[item] === '〇' || data[item] === '○') {
@@ -402,6 +404,9 @@
                                     score = score + 6;
                                 } else if (data[item] === '異' || data[item] === '複' || data[item] === '不') {
                                     score = score + 3;
+                                    datasetNgCnt = datasetNgCnt + 1;
+                                } else {
+                                    datasetNgCnt = datasetNgCnt + 1;
                                 }
                                 break;
                         }
@@ -438,6 +443,10 @@
                             break;
                         default:
                             color = 'black';
+                    }
+
+                    if (datasetNgCnt === 14) {
+                        color = 'black';
                     }
 
                     return color;
@@ -1009,6 +1018,7 @@
     html, body, #map {
       width:  100%;
       height: 100%;
+      -webkit-text-size-adjust: 100%;
     }
 
     /* 検索入力 */
@@ -1017,7 +1027,7 @@
       z-index: 2000;
     }
 
-    @media screen and (min-width: 576px) {
+    @media screen and (min-width: 767px) and (orientation: portrait) {
         #input-id {
             top: 3px;
             left: 3px;
@@ -1099,7 +1109,7 @@
         text-align: left;
     }
 
-    @media screen and (max-width: 576px) {
+    @media screen and (max-width: 767px) and (orientation: portrait) {
         .leaflet-control-window {
             width: 50%;
         }
