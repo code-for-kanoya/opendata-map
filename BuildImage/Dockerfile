@@ -8,7 +8,8 @@ COPY . /var/workspace
 WORKDIR /var/workspace
 
 RUN composer install \
-    && npm install
+    && npm install \
+    && npm run prod
 
 RUN chown www-data:www-data -Rf \
     storage/app \
