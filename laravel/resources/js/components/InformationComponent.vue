@@ -2,15 +2,17 @@
     <!-- ここにhtmlを記載します -->
     <div id="info-dataset" class="info-container">
         <div class="info-menu">
-            <div class="info-menu-top">
-                <div class="info-menu-arrow info-menu-up"></div>
-            </div>
-            <label class="info-action-label label-score">{{ infoData.score }} / 100 pt</label>
-            <button type="button" class="score-help"><i class="fas fa-question no-touch"></i></button>
-            <div class="info-action-label" style="margin:-10 0 -5 0;">
-                <span class="icon-rank"><i class="fas fa-crown"></i></span>
-                <div class="rank">{{ ranking }} / 233位</div>
-                <label class="label-time">2021年04月27日　時点</label>
+            <div class="touch-area">
+                <div class="info-menu-top">
+                    <div class="info-menu-arrow info-menu-up"></div>
+                </div>
+                <label class="info-action-label label-score">{{ infoData.score }} / 100 pt</label>
+                <button type="button" class="score-help"><i class="fas fa-question no-touch"></i></button>
+                <div class="info-action-label" style="margin:-10 0 -5 0;">
+                    <span class="icon-rank"><i class="fas fa-crown"></i></span>
+                    <div class="rank">{{ ranking }} / 233位</div>
+                    <label class="label-time">2021年04月27日　時点</label>
+                </div>
             </div>
             <div class="dataset row-cols-1 form-inline">
                 <div id="dataset-1">
@@ -407,7 +409,7 @@
                 });
 
                 // データセット一覧表示タップ処理
-                $('.info-menu').on('touchstart', function(e) {
+                $('.touch-area').on('touchstart', function(e) {
                     if (!($(e.target).hasClass('no-touch'))) {
                         if ($('.info-menu-arrow').hasClass('info-menu-up')) {
                             swipeUp();
@@ -450,6 +452,14 @@
                     }
                 };
 
+                function onTouchEnd(e) {
+                    if (!touched) {
+                        return;
+                    }
+
+                    touched = false;
+                };
+
                 // 上にスワイプ
                 function swipeUp() {
                     var top = scoreTop + 18;
@@ -471,14 +481,6 @@
                     $('.info-menu-arrow').addClass('info-menu-up');
                     $('.label-score').css('margin-top', 0);
                     $('.score-help').css('top', top);
-                };
-
-                function onTouchEnd(e) {
-                    if (!touched) {
-                        return;
-                    }
-
-                    touched = false;
                 };
 
                 // データセット一覧「地域・年齢別人口」のクリックイベントを実装
