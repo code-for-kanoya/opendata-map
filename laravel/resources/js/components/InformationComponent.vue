@@ -331,14 +331,24 @@
                     if(Math.abs(window.orientation) === 90) {
                         // 横向き
                         $('#map').css('height', '100%');
+                        $('.info-container').css('width', '345px');
                     } else {
                         // 縦向き
-                        if (window.matchMedia('(max-width: 767px)').matches) {
-                            // スマホ
-                            $('#map').css('height', infoTop);
-                        } else {
-                            // スマホ以外
+                        $('.info-container').css('width', '100%');
+
+                        if (navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('Android') > 0 && navigator.userAgent.indexOf('Mobile') > 0) {
+                            // スマホ用
+                            if (window.matchMedia('(max-width: 767px)').matches) {
+                                $('#map').css('height', infoTop);
+                            }
+                        } else if(navigator.userAgent.indexOf('iPad') > 0 || navigator.userAgent.indexOf('Android') > 0) {
+                            // タブレット用
                             $('#map').css('height', '100%');
+                            $('.info-container').css('width', '345px');
+                        } else {
+                            // PC用
+                            $('#map').css('height', '100%');
+                            $('.info-container').css('width', '345px');
                         }
                     }
                 };
@@ -382,7 +392,7 @@
                 // データセットボタンクリックイベントを実装
                 $('.btn-dataset').on('click', function() {
                     if ($(this).parent().attr('id').replace('dataset-', '') !== '0') {
-                        if (window.matchMedia('(max-width: 1024px)').matches) {
+                        if (window.matchMedia('(max-width: 767px)').matches) {
                             setBtnDatasetClick();
                         }
                     }
@@ -647,6 +657,7 @@
         width: 345px;
         transition: transform 0.3s;
         background-color: white;
+        overflow: auto;
     }
     .info-menu {
         position: relative;
@@ -741,31 +752,16 @@
     .icon-plot {
         margin: 0 0 0 -7;
         color: forestgreen;
-        font-size: 22px;
+        font-size: 21px;
     }
 
-    @media screen and (max-width: 767px) and (orientation: portrait) {
+    @media screen and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
         .info-container {
             width: 100%;
             margin-top: 0;
             top: calc(100% - 110px);
             transition: all .5s;
-        }
-        .info-menu-up {
-            display: block;
-            z-index: 3500;
-        }
-        .info-menu-down {
-            display: block;
-            z-index: 3500;
-        }
-    }
-
-    @media screen and (max-width: 1024px) {
-        .info-container {
-            margin-top: 0;
-            top: calc(100% - 110px);
-            transition: all .5s;
+            overflow: hidden;
         }
         .info-menu-up {
             display: block;
