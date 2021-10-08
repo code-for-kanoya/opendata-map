@@ -1067,7 +1067,7 @@
 
     /* ヘルプ */
     .leaflet-control-window {
-        width: 10%;
+        width: 20%;
     }
 
     /* 凡例 */
@@ -1109,9 +1109,19 @@
         text-align: left;
     }
 
-    @media screen and (max-width: 767px) and (orientation: portrait) {
-        .leaflet-control-window {
-            width: 50%;
+    @media screen and (orientation: portrait) {
+        @media screen and (max-width: 767px) {
+            .leaflet-control-window {
+                width: 50%;
+            }
+        }
+    }
+
+    @media screen and (orientation: landscape) {
+        @media screen and (max-width: 1023px) {
+            .leaflet-control-window {
+                width: 30%;
+            }
         }
     }
 

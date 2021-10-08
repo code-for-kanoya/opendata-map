@@ -7,7 +7,7 @@
                     <div class="info-menu-arrow info-menu-up"></div>
                 </div>
                 <label class="info-action-label label-score">{{ infoData.score }} / 100 pt</label>
-                <button type="button" class="score-help"><i class="fas fa-question no-touch"></i></button>
+                <button type="button" class="score-help"><i class="fas fa-question no-touch no-return"></i></button>
                 <div class="info-action-label" style="margin:-10 0 -5 0;">
                     <span class="icon-rank"><i class="fas fa-crown"></i></span>
                     <div class="rank">{{ ranking }} / 233位</div>
@@ -338,9 +338,9 @@
 
                         if (navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('Android') > 0 && navigator.userAgent.indexOf('Mobile') > 0) {
                             // スマホ用
-                            if (window.matchMedia('(max-width: 767px)').matches) {
-                                $('#map').css('height', infoTop);
-                            }
+                            infoTop = $('#info-dataset').position().top;
+                            $('#map').css('height', infoTop);
+
                         } else if(navigator.userAgent.indexOf('iPad') > 0 || navigator.userAgent.indexOf('Android') > 0) {
                             // タブレット用
                             $('#map').css('height', '100%');
@@ -400,11 +400,12 @@
 
                 // データセットボタンクリックイベント処理内容
                 function setBtnDatasetClick() {
-                    $('.info-container').css('top', 'calc(100% - 126px)');
-                    $('.info-container').css('overflow', 'hidden');
-                    $('.info-menu-arrow').removeClass('info-menu-down');
-                    $('.info-menu-arrow').addClass('info-menu-up');
-                    $('.info-container').scrollTop(0);
+                    // $('.info-container').css('top', 'calc(100% - 126px)');
+                    // $('.info-container').css('overflow', 'hidden');
+                    // $('.info-menu-arrow').removeClass('info-menu-down');
+                    // $('.info-menu-arrow').addClass('info-menu-up');
+                    // $('.info-container').scrollTop(0);
+                    swipeDown();
                 };
 
                 // データセット一覧表示スワイプイベントを実装
@@ -434,6 +435,10 @@
                                 swipeDown();
                             }
                         }
+                    }
+
+                    if (!($(e.target).hasClass('no-return'))) {
+                        return false;
                     }
                 });
 
@@ -496,16 +501,19 @@
                 // データセット一覧「地域・年齢別人口」のクリックイベントを実装
                 $('#dataset-11').on('click', function() {
                     $('#modal-dataset11').fadeIn();
+                    $('.info-container').css('overflow', 'hidden');
                 });
 
                 // データセット一覧「オープンデータ一覧」のクリックイベントを実装
                 $('#dataset-14').on('click', function() {
                     $('#modal-dataset14').fadeIn();
+                    $('.info-container').css('overflow', 'hidden');
                 });
 
                 // スコアヘルプボタンのクリックイベントを実装
                 $('.score-help').on('click', function() {
                     $('#modal-area').fadeIn();
+                    $('.info-container').css('overflow', 'hidden');
                 });
 
                 // モーダル閉じるボタンのクリックイベントを実装
@@ -513,12 +521,14 @@
                     $('#modal-dataset11').fadeOut();
                     $('#modal-dataset14').fadeOut();
                     $('#modal-area').fadeOut();
+                    $('.info-container').css('overflow', 'auto');
                 });
                 // モーダル背景のクリックイベントを実装
                 $('.modal-bg').on('click', function() {
                     $('#modal-dataset11').fadeOut();
                     $('#modal-dataset14').fadeOut();
                     $('#modal-area').fadeOut();
+                    $('.info-container').css('overflow', 'auto');
                 });
             });
 
@@ -755,7 +765,7 @@
         font-size: 21px;
     }
 
-    @media screen and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+    @media screen and (max-width: 1023px) and (hover: none) and (pointer: coarse) {
         .info-container {
             width: 100%;
             margin-top: 0;

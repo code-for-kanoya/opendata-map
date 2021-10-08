@@ -13,7 +13,6 @@
                     </option>
                 </select>
             </div>
-            <!-- <div id="municipality" class="col-6 col-md-4"> -->
             <div id="municipality">
                 <select id="select-municipality" class="form-control select-nocode" v-model="selectedMunicipality" v-on:change="selectMunicipality">
                     <option class="select-nocode" value="000000">市区町村</option>
