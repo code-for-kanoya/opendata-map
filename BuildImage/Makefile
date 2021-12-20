@@ -20,7 +20,7 @@ build-base:
 	-f ../.devcontainer/container-context-opendata-map/build/php/Dockerfile \
 	--target app_base \
 	--build-arg VERSION=$(VERSION) \
-  --build-arg NODE_VERSION=$(NODE_VERSION) \
+	--build-arg NODE_VERSION=$(NODE_VERSION) \
 	../.devcontainer/container-context-opendata-map/build/php
 
 build-production:

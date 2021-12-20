@@ -14,6 +14,7 @@ spec:
   selector:
     {{- include "opendata-map.selectorLabels" . | nindent 4 }}
 ---
+{{- if .Values.db.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,6 +30,7 @@ spec:
       name: http
   selector:
     statefulset.kubernetes.io/pod-name: opendata-map-db-0
+{{- end }}
 ---
 apiVersion: v1
 kind: Service

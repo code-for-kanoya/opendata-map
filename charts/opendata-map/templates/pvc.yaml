@@ -41,3 +41,18 @@ spec:
     requests:
       storage: {{ .Values.openstreetmap.persistentVolume.tileCache.size }}
 {{- end }}
+
+---
+{{- if and .Values.openstreetmap.init.enabled (and .Values.openstreetmap.init.persistentVolume.nodeCache.enabled (not .Values.openstreetmap.init.persistentVolume.nodeCache.existingClaim.enable)) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-pv-map-flatnode-cache-claim
+spec:
+  storageClassName: {{ .Values.openstreetmap.persistentVolume.nodeCache.storageClass }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.openstreetmap.persistentVolume.nodeCache.size }}
+{{- end }}

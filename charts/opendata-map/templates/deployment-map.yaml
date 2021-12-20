@@ -61,13 +61,16 @@ spec:
               mountPath: "/var/lib/mod_tile"
           command: ["/run.sh"]
           args: ["run"]
+      {{- if .Values.openstreetmap.init.enabled }}
       initContainers:
         - name: init-mapdata
           image: "{{ .Values.openstreetmap.image.repository }}:{{ .Values.openstreetmap.image.tag | default .Chart.AppVersion }}"
-          command: ['sh', '-c', 
-                    "curl -o /data.osm.pbf https://download.geofabrik.de/asia/japan/kyushu-latest.osm.pbf && curl -o /data.poly https://download.geofabrik.de/asia/japan/kyushu.poly && /run.sh import"]
+          command: ['sh', '-c',
+                    "rm -rf /var/lib/postgresql/12/main/lost+found\n if [ ! -f /var/lib/postgresql/12/main/PG_VERSION ]; then\n /run.sh import\n fi\n"]
+          resources:
+            {{- toYaml .Values.openstreetmap.init.resources | nindent 12 }}
           env:
-            {{- with .Values.openstreetmap.environment }}
+            {{- with .Values.openstreetmap.init.environment }}
               {{- range . }}
               - name: {{ .name }}
                 value: "{{ .value }}"
@@ -78,6 +81,11 @@ spec:
               mountPath: "/var/lib/postgresql/12/main"
             - name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-storage
               mountPath: "/var/lib/mod_tile"
+            {{- if .Values.openstreetmap.init.persistentVolume.nodeCache.enabled }}
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-flatnode-cache-storage
+              mountPath: "/nodes"
+            {{- end }}
+      {{- end }}
       volumes:
         - name: {{ include "opendata-map.fullname" . }}-pv-map-db-storage
           persistentVolumeClaim:
@@ -93,6 +101,15 @@ spec:
             {{- else }}
             claimName: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-claim
             {{- end }}
+        {{- if (and .Values.openstreetmap.init.enabled .Values.openstreetmap.init.persistentVolume.nodeCache.enabled) }}
+        - name: {{ include "opendata-map.fullname" . }}-pv-map-flatnode-cache-storage
+          persistentVolumeClaim:
+            {{- if .Values.openstreetmap.persistentVolume.nodeCache.existingClaim.enable }}
+            claimName: {{ .Values.openstreetmap.persistentVolume.nodeCache.existingClaim.name }}
+            {{- else }}
+            claimName: {{ include "opendata-map.fullname" . }}-pv-map-flatnode-cache-claim
+            {{- end }}
+        {{- end }}
       {{- with .Values.openstreetmap.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
