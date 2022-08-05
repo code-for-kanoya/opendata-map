@@ -156,7 +156,7 @@ openstreetmap:
 
   environment:
     - name: UPDATES
-      value: "enabled"
+      value: "disabled"
     - name: ALLOW_CORS
       value: "enabled"
     - name: THREADS
@@ -256,6 +256,13 @@ openstreetmap:
       - name: DOWNLOAD_POLY
         value: ""
     persistentVolume:
+      importData:
+        enabled: false
+        existingClaim:
+          enable: true
+          name: hoge-map-db-import-data
+        storageClass: azurefile
+        size: 1Gi # /data/region.osm.pbf, /data/region.poly ファイルの配置先
       nodeCache:
         enabled: false
         existingClaim:

@@ -43,6 +43,21 @@ spec:
 {{- end }}
 
 ---
+{{- if and .Values.openstreetmap.init.enabled (and .Values.openstreetmap.init.persistentVolume.importData.enabled (not .Values.openstreetmap.init.persistentVolume.importData.existingClaim.enable)) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "opendata-map.fullname" . }}-pv-map-import-data-claim
+spec:
+  storageClassName: {{ .Values.openstreetmap.persistentVolume.importData.storageClass }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.openstreetmap.persistentVolume.importData.size }}
+{{- end }}
+
+---
 {{- if and .Values.openstreetmap.init.enabled (and .Values.openstreetmap.init.persistentVolume.nodeCache.enabled (not .Values.openstreetmap.init.persistentVolume.nodeCache.existingClaim.enable)) }}
 apiVersion: v1
 kind: PersistentVolumeClaim

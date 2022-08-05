@@ -56,9 +56,13 @@ spec:
             {{- end }}
           volumeMounts:
             - name: {{ include "opendata-map.fullname" . }}-pv-map-db-storage
-              mountPath: "/var/lib/postgresql/12/main"
+              mountPath: "/data/database"
             - name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-storage
-              mountPath: "/var/lib/mod_tile"
+              mountPath: "/data/tiles"
+            {{- if .Values.openstreetmap.init.persistentVolume.importData.enabled }}
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-import-data-claim-storage
+              mountPath: "/import-data"
+            {{- end }}
           command: ["/run.sh"]
           args: ["run"]
       {{- if .Values.openstreetmap.init.enabled }}
@@ -66,7 +70,7 @@ spec:
         - name: init-mapdata
           image: "{{ .Values.openstreetmap.image.repository }}:{{ .Values.openstreetmap.image.tag | default .Chart.AppVersion }}"
           command: ['sh', '-c',
-                    "rm -rf /var/lib/postgresql/12/main/lost+found\n if [ ! -f /var/lib/postgresql/12/main/PG_VERSION ]; then\n /run.sh import\n fi\n"]
+                    "rm -rf /data/database/lost+found\n if [ -f /import-data/region.osm.pbf ]; then\n ln -sf /import-data/region.osm.pbf /data/region.osm.pbf\n fi\n if [ -f /import-data/region.poly ]; then\n ln -sf /import-data/region.poly /data/region.poly\n fi\n if [ ! -d /data/database/postgres ]; then\n /run.sh import\n fi\n"]
           resources:
             {{- toYaml .Values.openstreetmap.init.resources | nindent 12 }}
           env:
@@ -78,9 +82,13 @@ spec:
             {{- end }}
           volumeMounts:
             - name: {{ include "opendata-map.fullname" . }}-pv-map-db-storage
-              mountPath: "/var/lib/postgresql/12/main"
+              mountPath: "/data/database"
             - name: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-storage
-              mountPath: "/var/lib/mod_tile"
+              mountPath: "/data/tiles"
+            {{- if .Values.openstreetmap.init.persistentVolume.importData.enabled }}
+            - name: {{ include "opendata-map.fullname" . }}-pv-map-import-data-claim-storage
+              mountPath: "/import-data"
+            {{- end }}
             {{- if .Values.openstreetmap.init.persistentVolume.nodeCache.enabled }}
             - name: {{ include "opendata-map.fullname" . }}-pv-map-flatnode-cache-storage
               mountPath: "/nodes"
@@ -101,6 +109,15 @@ spec:
             {{- else }}
             claimName: {{ include "opendata-map.fullname" . }}-pv-map-tile-cache-claim
             {{- end }}
+        {{- if (and .Values.openstreetmap.init.enabled .Values.openstreetmap.init.persistentVolume.importData.enabled) }}
+        - name: {{ include "opendata-map.fullname" . }}-pv-map-import-data-claim-storage
+          persistentVolumeClaim:
+            {{- if .Values.openstreetmap.persistentVolume.importData.existingClaim.enable }}
+            claimName: {{ .Values.openstreetmap.persistentVolume.importData.existingClaim.name }}
+            {{- else }}
+            claimName: {{ include "opendata-map.fullname" . }}-pv-map-import-data-claim
+            {{- end }}
+        {{- end }}
         {{- if (and .Values.openstreetmap.init.enabled .Values.openstreetmap.init.persistentVolume.nodeCache.enabled) }}
         - name: {{ include "opendata-map.fullname" . }}-pv-map-flatnode-cache-storage
           persistentVolumeClaim:
